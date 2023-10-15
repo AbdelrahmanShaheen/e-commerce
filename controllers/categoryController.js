@@ -1,6 +1,9 @@
 const Category = require("../models/category");
 const ObjectID = require("mongoose").Types.ObjectId;
 const slugify = require("slugify");
+//@desc Get a specific category
+//@route GET /api/v1/categories/:id
+//@access Public
 const getCategory = async (req, res) => {
   const { id } = req.params;
   if (!ObjectID.isValid(id))
@@ -16,6 +19,9 @@ const getCategory = async (req, res) => {
     res.status(500).send();
   }
 };
+//@desc Create category
+//@route POST /api/v1/categories
+//@access Private
 const createCategory = async (req, res) => {
   const { name } = req.body;
   const newCategory = new Category({ name, slug: slugify(name) });
@@ -26,6 +32,9 @@ const createCategory = async (req, res) => {
     res.status(400).send({ error: err.message });
   }
 };
+//@desc Get list of categories
+//@route GET /api/v1/categories
+//@access Public
 const getCategories = async (req, res) => {
   try {
     const options = {};
@@ -51,6 +60,9 @@ const getCategories = async (req, res) => {
     res.status(500).send({ error: err.message });
   }
 };
+//@desc Update category
+//@route PUT /api/v1/categories/:id
+//@access Private
 const updateCategory = async (req, res) => {
   const { id } = req.params;
   console.log(id);
@@ -71,6 +83,9 @@ const updateCategory = async (req, res) => {
     res.status(500).send({ error: err.message });
   }
 };
+//@desc Delete category
+//@route POST /api/v1/categories/:id
+//@access Private
 const deleteCategory = async (req, res) => {
   const { id } = req.params;
   if (!ObjectID.isValid(id))

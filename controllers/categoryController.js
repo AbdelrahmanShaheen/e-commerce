@@ -1,7 +1,20 @@
 const Category = require("../models/category");
+const ObjectID = require("mongoose").Types.ObjectId;
 const slugify = require("slugify");
-const getCategory = (req, res) => {
-  res.send();
+const getCategory = async (req, res) => {
+  const { id } = req.params;
+  if (!ObjectID.isValid(id))
+    return res
+      .status(406)
+      .send({ message: "Category with that invalid id does not exist!" });
+  try {
+    const category = await Category.findById(id);
+    if (!category)
+      res.status(404).send({ message: "Category with this id is not found" });
+    res.status(200).send(category);
+  } catch (err) {
+    res.status(500).send();
+  }
 };
 const createCategory = async (req, res) => {
   const { name } = req.body;
@@ -39,4 +52,4 @@ const getCategories = async (req, res) => {
   }
 };
 
-module.exports = { getCategory, createCategory, getCategories };
+module.exports = { getCategory, createCategory, getCategories, getCategory };

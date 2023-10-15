@@ -11,7 +11,7 @@ const getCategory = async (req, res) => {
     const category = await Category.findById(id);
     if (!category)
       res.status(404).send({ message: "Category with this id is not found" });
-    res.status(200).send(category);
+    res.status(200).send({ data: category });
   } catch (err) {
     res.status(500).send();
   }
@@ -51,5 +51,47 @@ const getCategories = async (req, res) => {
     res.status(500).send({ error: err.message });
   }
 };
-
-module.exports = { getCategory, createCategory, getCategories, getCategory };
+const updateCategory = async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  if (!ObjectID.isValid(id))
+    return res
+      .status(406)
+      .send({ message: "Category with that invalid id does not exist!" });
+  const { name } = req.body;
+  try {
+    const category = await Category.findById(id);
+    if (!category)
+      res.status(404).send({ message: "Category with this id is not found" });
+    category["name"] = name;
+    category["slug"] = slugify(name);
+    category.save();
+    res.status(200).send({ data: category });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+};
+const deleteCategory = async (req, res) => {
+  const { id } = req.params;
+  if (!ObjectID.isValid(id))
+    return res
+      .status(406)
+      .send({ message: "Category with that invalid id does not exist!" });
+  try {
+    const category = await Category.findByIdAndRemove(id);
+    console.log(category);
+    if (!category)
+      res.status(404).send({ message: "Category with this id is not found" });
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+};
+module.exports = {
+  getCategory,
+  createCategory,
+  getCategories,
+  getCategory,
+  updateCategory,
+  deleteCategory,
+};

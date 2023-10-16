@@ -20,10 +20,19 @@ app.use("/api/v1/categories", categoryRouter);
 app.all("*", (req, res, next) => {
   next(new AppError(`cannot find ${req.originalUrl} on the server`, 404));
 });
-//Use Global Error Handling Middleware
+//Use Global Error Handling Middleware inside express
 app.use(globalErrorHandler);
 //........................
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+});
+
+//Handling rejections that express does not handle
+process.on("unhandledRejection", (error) => {
+  console.error(`unhandledRejection Errors: ${error.name} | ${error.message}`);
+  server.close(() => {
+    console.error("Shutting down....");
+    process.exit(1);
+  });
 });

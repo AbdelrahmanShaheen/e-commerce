@@ -27,4 +27,26 @@ const createSubCategory = asyncHandler(async (req, res, next) => {
   await newSubCategory.save();
   res.status(201).send({ data: newSubCategory });
 });
-module.exports = { createSubCategory };
+
+//@desc Get list of subCategories
+//@route GET /api/v1/subCategories
+//@access Public
+const getSubCategories = asyncHandler(async (req, res) => {
+  const options = {};
+  if (req.query.page && req.query.limit) {
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const skip = (page - 1) * limit;
+    options.skip = skip;
+    options.limit = limit;
+  }
+  if (req.query.sortBy) {
+    const parts = req.query.sortBy.split(":");
+    options.sort = {
+      [parts[0]]: parts[1] === "desc" ? -1 : 1,
+    };
+  }
+  const subCategories = await SubCategory.find({}, null, options);
+  res.status(200).send({ results: subCategories.length, data: subCategories });
+});
+module.exports = { createSubCategory, getSubCategories };

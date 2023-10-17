@@ -3,6 +3,7 @@ dotenv.config({ path: "./config.env" });
 require("./db/mongoose.js");
 const morgan = require("morgan");
 const categoryRouter = require("./routers/categoryRouter.js");
+const subCategoryRouter = require("./routers/subCategoryRouter.js");
 const Category = require("./models/category.js");
 const { getCategory } = require("./controllers/categoryController.js");
 const AppError = require("./utils/AppError.js");
@@ -16,6 +17,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 app.use("/api/v1/categories", categoryRouter);
+app.use("/api/v1/subCategories", subCategoryRouter);
 //Catching Unhandled Routes
 app.all("*", (req, res, next) => {
   next(new AppError(`cannot find ${req.originalUrl} on the server`, 404));

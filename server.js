@@ -1,13 +1,15 @@
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 require("./db/mongoose.js");
+
 const morgan = require("morgan");
-const categoryRouter = require("./routers/categoryRouter.js");
-const subCategoryRouter = require("./routers/subCategoryRouter.js");
-const Category = require("./models/category.js");
-const { getCategory } = require("./controllers/categoryController.js");
 const AppError = require("./utils/AppError.js");
 const globalErrorHandler = require("./middlewares/errorMiddleware.js");
+//routers
+const categoryRouter = require("./routers/categoryRouter.js");
+const subCategoryRouter = require("./routers/subCategoryRouter.js");
+const brandRouter = require("./routers/brandRouter.js");
+//.............
 const express = require("express");
 const app = express();
 
@@ -18,6 +20,7 @@ if (process.env.NODE_ENV === "development") {
 }
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/subCategories", subCategoryRouter);
+app.use("/api/v1/brands", brandRouter);
 //Catching Unhandled Routes
 app.all("*", (req, res, next) => {
   next(new AppError(`cannot find ${req.originalUrl} on the server`, 404));

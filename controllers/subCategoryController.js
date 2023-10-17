@@ -49,4 +49,19 @@ const getSubCategories = asyncHandler(async (req, res) => {
   const subCategories = await SubCategory.find({}, null, options);
   res.status(200).send({ results: subCategories.length, data: subCategories });
 });
-module.exports = { createSubCategory, getSubCategories };
+
+//@desc Get a specific subCategory
+//@route GET /api/v1/subCategories/:id
+//@access Public
+const getSubCategory = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  if (!ObjectID.isValid(id))
+    return next(
+      new AppError("subCategory with that invalid id does not exist!", 400)
+    );
+  const subCategory = await SubCategory.findById(id);
+  if (!subCategory)
+    return next(new AppError("subCategory with this id is not found", 404));
+  res.status(200).send({ data: subCategory });
+});
+module.exports = { createSubCategory, getSubCategories, getSubCategory };

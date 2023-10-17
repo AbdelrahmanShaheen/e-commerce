@@ -32,6 +32,11 @@ const createSubCategory = asyncHandler(async (req, res, next) => {
 //@route GET /api/v1/subCategories
 //@access Public
 const getSubCategories = asyncHandler(async (req, res) => {
+  const { categoryId } = req.params;
+  const filterObj = {};
+  //Apply Nested route
+  if (categoryId) filterObj.category = categoryId;
+
   const options = {};
   if (req.query.page && req.query.limit) {
     const page = parseInt(req.query.page);
@@ -46,7 +51,7 @@ const getSubCategories = asyncHandler(async (req, res) => {
       [parts[0]]: parts[1] === "desc" ? -1 : 1,
     };
   }
-  const subCategories = await SubCategory.find({}, null, options);
+  const subCategories = await SubCategory.find(filterObj, null, options);
   res.status(200).send({ results: subCategories.length, data: subCategories });
 });
 

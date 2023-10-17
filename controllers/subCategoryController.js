@@ -9,6 +9,9 @@ const SubCategory = require("../models/subCategory");
 //@route POST /api/v1/subCategories
 //@access Private
 const createSubCategory = asyncHandler(async (req, res, next) => {
+  //Apply Nested route
+  if (!req.body.category) req.body.category = req.params.categoryId;
+
   const { name, category } = req.body;
   if (!ObjectID.isValid(category))
     return next(

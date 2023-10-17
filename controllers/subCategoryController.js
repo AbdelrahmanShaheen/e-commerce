@@ -91,9 +91,25 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
   subCategory.save();
   res.status(200).send({ data: subCategory });
 });
+
+//@desc Delete category
+//@route POST /api/v1/categories/:id
+//@access Private
+const deleteSubCategory = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  if (!ObjectID.isValid(id))
+    return next(
+      new AppError("subCategory with that invalid id does not exist!", 400)
+    );
+  const subCategory = await SubCategory.findByIdAndRemove(id);
+  if (!subCategory)
+    return next(new AppError("subCategory with this id is not found", 404));
+  res.status(204).send();
+});
 module.exports = {
   createSubCategory,
   getSubCategories,
   getSubCategory,
   updateSubCategory,
+  deleteSubCategory,
 };

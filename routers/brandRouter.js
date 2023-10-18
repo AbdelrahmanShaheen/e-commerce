@@ -1,4 +1,6 @@
 const express = require("express");
+const updateBrandValidator = require("../utils/validators/brandValidator");
+
 const {
   getBrand,
   createBrand,
@@ -11,5 +13,5 @@ const app = express();
 const brandRouter = express.Router();
 
 brandRouter.route("/").post(createBrand).get(getBrands);
-brandRouter.route("/:id").get(getBrand).put(updateBrand).delete(deleteBrand);
+brandRouter.route("/:id").get(getBrand).put(updateBrandValidator,updateBrand).delete(deleteBrand);
 module.exports = brandRouter;

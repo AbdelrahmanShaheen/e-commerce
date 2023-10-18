@@ -5,19 +5,34 @@ const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
 const SubCategory = require("../models/subCategory");
 
+const setCategoryIdToBody = (req, res, next) => {
+  req.body.category = req.params.categoryId;
+  delete req.params.categoryId;
+  next();
+};
 
+const setSubCategoryIdToBody = (req, res, next) => {
+  req.body.id = req.params.id;
+  delete req.params.id;
+  next();
+};
+
+const setFilterObjToBody = (req, res, next) => {
+  const { categoryId } = req.params;
+  const filterObj = {};
+  if (categoryId) {
+    req.body.category = categoryId;
+    filterObj.category = categoryId;
+  }
+  req.body.filterObj = filterObj;
+  delete req.params.categoryId;
+  next();
+};
 //@desc Create subCategory
 //@route POST /api/v1/subCategories
 //@access Private
 const createSubCategory = asyncHandler(async (req, res, next) => {
-  //Apply Nested route
-  if (!req.body.category) req.body.category = req.params.categoryId;
-
   const { name, category } = req.body;
-  if (!ObjectID.isValid(category))
-    return next(
-      new AppError("Category with that invalid id does not exist!", 400)
-    );
   const categoryObj = await Category.findById(category);
   if (!categoryObj)
     return next(new AppError("Category with this id is not found", 404));
@@ -36,11 +51,6 @@ const createSubCategory = asyncHandler(async (req, res, next) => {
 //@route GET /api/v1/subCategories
 //@access Public
 const getSubCategories = asyncHandler(async (req, res) => {
-  const { categoryId } = req.params;
-  const filterObj = {};
-  //Apply Nested route
-  if (categoryId) filterObj.category = categoryId;
-
   const options = {};
   if (req.query.page && req.query.limit) {
     const page = parseInt(req.query.page);
@@ -55,7 +65,11 @@ const getSubCategories = asyncHandler(async (req, res) => {
       [parts[0]]: parts[1] === "desc" ? -1 : 1,
     };
   }
-  const subCategories = await SubCategory.find(filterObj, null, options);
+  const subCategories = await SubCategory.find(
+    req.body.filterObj,
+    null,
+    options
+  );
   res.status(200).send({ results: subCategories.length, data: subCategories });
 });
 
@@ -63,11 +77,7 @@ const getSubCategories = asyncHandler(async (req, res) => {
 //@route GET /api/v1/subCategories/:id
 //@access Public
 const getSubCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  if (!ObjectID.isValid(id))
-    return next(
-      new AppError("subCategory with that invalid id does not exist!", 400)
-    );
+  const { id } = req.body;
   const subCategory = await SubCategory.findById(id);
   if (!subCategory)
     return next(new AppError("subCategory with this id is not found", 404));
@@ -78,44 +88,39 @@ const getSubCategory = asyncHandler(async (req, res, next) => {
 //@route PUT /api/v1/categories/:id
 //@access Private
 const updateSubCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  if (!ObjectID.isValid(id))
-    return next(
-      new AppError("subCategory with that invalid id does not exist!", 400)
-    );
+  const { id, name, category } = req.body;
   const subCategory = await SubCategory.findById(id);
+
   if (!subCategory)
     return next(new AppError("subCategory with this id is not found", 404));
   //handle error when updating by field that does not exist in the subCategory
   const allowedUpdates = ["name", "category"];
+  delete req.body.id;
   const updates = Object.keys(req.body);
   const isValidOperation = updates.every((update) =>
     allowedUpdates.includes(update)
   );
   if (!isValidOperation) return next(new AppError("invalid updates!", 400));
-  for(const update of updates)
-    {
-      if(update === "category"){
-        if (!ObjectID.isValid(req.body[update]))
-            return next(
-              new AppError("Category with that invalid id does not exist!", 400)
-            );
-        const category = await Category.findById(req.body[update]);
-        if (!category)
-            return next(new AppError("Category with this id is not found", 404));
-      }else{
-        //check if there is a subCategory with this name is exists.....
-        const {name} = req.body;
-        const duplicateSubCategory = await SubCategory.findOne({name});
-        if(duplicateSubCategory)
-          return next(
-            new AppError("Duplicate! subCategory with this name exists!", 400)
-          );
-       //...........................................................
-      }
-      subCategory[update] = req.body[update];
+  //if categoryId entered to be changed
+  if (category) {
+    const categoryObj = await Category.findById(category);
+    if (!categoryObj)
+      return next(new AppError("Category with this id is not found", 404));
+    else subCategory["category"] = category;
+  }
+  //if name entered to be changed
+  if (name) {
+    const duplicateSubCategory = await SubCategory.findOne({ name });
+    //check if there is a subCategory with this name is exists.....
+    if (duplicateSubCategory)
+      return next(
+        new AppError("Duplicate! subCategory with this name exists!", 400)
+      );
+    else {
+      subCategory["name"] = name;
+      subCategory["slug"] = slugify(name);
     }
-  if (updates.includes("name")) subCategory["slug"] = slugify(req.body["name"]);
+  }
   subCategory.save();
   res.status(200).send({ data: subCategory });
 });
@@ -124,11 +129,7 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
 //@route POST /api/v1/categories/:id
 //@access Private
 const deleteSubCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  if (!ObjectID.isValid(id))
-    return next(
-      new AppError("subCategory with that invalid id does not exist!", 400)
-    );
+  const { id } = req.body;
   const subCategory = await SubCategory.findByIdAndRemove(id);
   if (!subCategory)
     return next(new AppError("subCategory with this id is not found", 404));
@@ -140,4 +141,7 @@ module.exports = {
   getSubCategory,
   updateSubCategory,
   deleteSubCategory,
+  setCategoryIdToBody,
+  setFilterObjToBody,
+  setSubCategoryIdToBody,
 };

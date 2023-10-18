@@ -85,7 +85,6 @@ const deleteCategory = asyncHandler(async (req, res, next) => {
       new AppError("Category with that invalid id does not exist!", 400)
     );
   const category = await Category.findByIdAndRemove(id);
-  console.log(category);
   if (!category)
     return next(new AppError("Category with this id is not found", 404));
   res.status(204).send();

@@ -5,6 +5,7 @@ const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
 const SubCategory = require("../models/subCategory");
 
+
 //@desc Create subCategory
 //@route POST /api/v1/subCategories
 //@access Private
@@ -92,9 +93,28 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
     allowedUpdates.includes(update)
   );
   if (!isValidOperation) return next(new AppError("invalid updates!", 400));
-  updates.forEach((update) => {
-    subCategory[update] = req.body[update];
-  });
+  for(const update of updates)
+    {
+      if(update === "category"){
+        if (!ObjectID.isValid(req.body[update]))
+            return next(
+              new AppError("Category with that invalid id does not exist!", 400)
+            );
+        const category = await Category.findById(req.body[update]);
+        if (!category)
+            return next(new AppError("Category with this id is not found", 404));
+      }else{
+        //check if there is a subCategory with this name is exists.....
+        const {name} = req.body;
+        const duplicateSubCategory = await SubCategory.findOne({name});
+        if(duplicateSubCategory)
+          return next(
+            new AppError("Duplicate! subCategory with this name exists!", 400)
+          );
+       //...........................................................
+      }
+      subCategory[update] = req.body[update];
+    }
   if (updates.includes("name")) subCategory["slug"] = slugify(req.body["name"]);
   subCategory.save();
   res.status(200).send({ data: subCategory });

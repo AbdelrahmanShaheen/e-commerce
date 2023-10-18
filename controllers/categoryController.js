@@ -63,6 +63,13 @@ const updateCategory = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(id);
   if (!category)
     return next(new AppError("Category with this id is not found", 404));
+  //check if there is a category with this name is exists.....
+  const duplicateCategory = await Category.findOne({name});
+  if(duplicateCategory)
+    return next(
+      new AppError("Duplicate! category with this name exists!", 400)
+    );
+  //...........................................................
   category["name"] = name;
   category["slug"] = slugify(name);
   category.save();

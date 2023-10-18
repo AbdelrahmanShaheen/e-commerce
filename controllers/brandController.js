@@ -4,16 +4,17 @@ const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
 
+const setBrandIdToBody = (req, res, next) => {
+  req.body.brandId = req.params.id;
+  next();
+};
+
 //@desc Get a specific brand
 //@route GET /api/v1/brands/:id
 //@access Public
 const getBrand = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  if (!ObjectID.isValid(id))
-    return next(
-      new AppError("Brand with that invalid id does not exist!", 400)
-    );
-  const brand = await Brand.findById(id);
+  const { brandId } = req.body;
+  const brand = await Brand.findById(brandId);
   if (!brand) return next(new AppError("Brand with this id is not found", 404));
   res.status(200).send({ data: brand });
 });
@@ -53,20 +54,14 @@ const getBrands = asyncHandler(async (req, res) => {
 //@route PUT /api/v1/brands/:id
 //@access Private
 const updateBrand = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  if (!ObjectID.isValid(id))
-    return next(
-      new AppError("Brand with that invalid id does not exist!", 400)
-    );
+  const { brandId } = req.body;
   const { name } = req.body;
-  const brand = await Brand.findById(id);
+  const brand = await Brand.findById(brandId);
   if (!brand) return next(new AppError("Brand with this id is not found", 404));
   //check if there is a brand with this name is exists.....
-  const duplicateBrand = await Brand.findOne({name});
-  if(duplicateBrand)
-    return next(
-      new AppError("Duplicate! brand with this name exists!", 400)
-    );
+  const duplicateBrand = await Brand.findOne({ name });
+  if (duplicateBrand)
+    return next(new AppError("Duplicate! brand with this name exists!", 400));
   //...........................................................
   brand["name"] = name;
   brand["slug"] = slugify(name);
@@ -77,12 +72,8 @@ const updateBrand = asyncHandler(async (req, res, next) => {
 //@route POST /api/v1/brands/:id
 //@access Private
 const deleteBrand = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  if (!ObjectID.isValid(id))
-    return next(
-      new AppError("Brand with that invalid id does not exist!", 400)
-    );
-  const brand = await Brand.findByIdAndRemove(id);
+  const { brandId } = req.body;
+  const brand = await Brand.findByIdAndRemove(brandId);
   if (!brand)
     return next(new AppError("Category with this id is not found", 404));
   res.status(204).send();
@@ -93,4 +84,5 @@ module.exports = {
   getBrands,
   updateBrand,
   deleteBrand,
+  setBrandIdToBody,
 };

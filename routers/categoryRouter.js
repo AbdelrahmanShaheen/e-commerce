@@ -1,14 +1,18 @@
 const express = require("express");
-const updateCategoryValidator = require("../utils/validators/categoryValidator");
+const {
+  updateCategoryValidator,
+  categoryIdValidator,
+} = require("../utils/validators/categoryValidator");
 const {
   getCategory,
   createCategory,
   getCategories,
   updateCategory,
   deleteCategory,
+  setCategoryIdToBody,
 } = require("../controllers/categoryController.js");
 const subCategoryRouter = require("./subCategoryRouter.js");
-const app = express();
+
 const categoryRouter = express.Router();
 //for nested routes :
 categoryRouter.use("/:categoryId/subCategories", subCategoryRouter);
@@ -16,7 +20,7 @@ categoryRouter.use("/:categoryId/subCategories", subCategoryRouter);
 categoryRouter.route("/").post(createCategory).get(getCategories);
 categoryRouter
   .route("/:id")
-  .get(getCategory)
-  .put(updateCategoryValidator,updateCategory)
-  .delete(deleteCategory);
+  .get(setCategoryIdToBody, categoryIdValidator, getCategory)
+  .put(setCategoryIdToBody, updateCategoryValidator, updateCategory)
+  .delete(setCategoryIdToBody, categoryIdValidator, deleteCategory);
 module.exports = categoryRouter;

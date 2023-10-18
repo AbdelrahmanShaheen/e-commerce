@@ -9,7 +9,17 @@ const updateCategoryValidator = [
     .withMessage("A category name must have at least 3 characters")
     .isLength({ max: 32 })
     .withMessage("A category name must have at most 32 characters"),
+  check("id")
+    .optional()
+    .isMongoId()
+    .withMessage("Category with that invalid id does not exist!"),
+  validatorMiddleware,
+];
+const categoryIdValidator = [
+  check("id")
+    .isMongoId()
+    .withMessage("Category with that invalid id does not exist!"),
   validatorMiddleware,
 ];
 
-module.exports = updateCategoryValidator;
+module.exports = { updateCategoryValidator, categoryIdValidator };

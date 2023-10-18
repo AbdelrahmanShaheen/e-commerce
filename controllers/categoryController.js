@@ -4,15 +4,18 @@ const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
 
+const setCategoryIdToBody = (req, res, next) => {
+  req.body.id = req.params.id;
+  delete req.params.categoryId;
+  next();
+};
+
 //@desc Get a specific category
 //@route GET /api/v1/categories/:id
 //@access Public
 const getCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  if (!ObjectID.isValid(id))
-    return next(
-      new AppError("Category with that invalid id does not exist!", 400)
-    );
+  const { id } = req.body;
+
   const category = await Category.findById(id);
   if (!category)
     return next(new AppError("Category with this id is not found", 404));
@@ -54,18 +57,15 @@ const getCategories = asyncHandler(async (req, res) => {
 //@route PUT /api/v1/categories/:id
 //@access Private
 const updateCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  if (!ObjectID.isValid(id))
-    return next(
-      new AppError("Category with that invalid id does not exist!", 400)
-    );
+  const { id } = req.body;
+
   const { name } = req.body;
   const category = await Category.findById(id);
   if (!category)
     return next(new AppError("Category with this id is not found", 404));
   //check if there is a category with this name is exists.....
-  const duplicateCategory = await Category.findOne({name});
-  if(duplicateCategory)
+  const duplicateCategory = await Category.findOne({ name });
+  if (duplicateCategory)
     return next(
       new AppError("Duplicate! category with this name exists!", 400)
     );
@@ -79,11 +79,8 @@ const updateCategory = asyncHandler(async (req, res, next) => {
 //@route POST /api/v1/categories/:id
 //@access Private
 const deleteCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  if (!ObjectID.isValid(id))
-    return next(
-      new AppError("Category with that invalid id does not exist!", 400)
-    );
+  const { id } = req.body;
+
   const category = await Category.findByIdAndRemove(id);
   if (!category)
     return next(new AppError("Category with this id is not found", 404));
@@ -95,4 +92,5 @@ module.exports = {
   getCategories,
   updateCategory,
   deleteCategory,
+  setCategoryIdToBody,
 };

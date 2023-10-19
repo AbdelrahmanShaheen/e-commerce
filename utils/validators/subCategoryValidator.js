@@ -20,7 +20,6 @@ const updateSubCategoryValidator = [
 ];
 const categoryIdValidator = [
   check("category")
-    .optional()
     .isMongoId()
     .withMessage("Category with that invalid id does not exist!"),
   validatorMiddleware,
@@ -28,7 +27,6 @@ const categoryIdValidator = [
 
 const subCategoryIdValidator = [
   check("id")
-    .optional()
     .isMongoId()
     .withMessage("subCategory with that invalid id does not exist!"),
   validatorMiddleware,

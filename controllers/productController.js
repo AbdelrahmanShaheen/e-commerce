@@ -1,5 +1,4 @@
 const Product = require("../models/product");
-const ObjectID = require("mongoose").Types.ObjectId;
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");

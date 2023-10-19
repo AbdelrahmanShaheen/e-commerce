@@ -9,6 +9,7 @@ const globalErrorHandler = require("./middlewares/errorMiddleware.js");
 const categoryRouter = require("./routers/categoryRouter.js");
 const subCategoryRouter = require("./routers/subCategoryRouter.js");
 const brandRouter = require("./routers/brandRouter.js");
+const productRouter = require("./routers/productRouter.js");
 //.............
 const express = require("express");
 const app = express();
@@ -21,6 +22,7 @@ if (process.env.NODE_ENV === "development") {
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/subCategories", subCategoryRouter);
 app.use("/api/v1/brands", brandRouter);
+app.use("/api/v1/products", productRouter);
 //Catching Unhandled Routes
 app.all("*", (req, res, next) => {
   next(new AppError(`cannot find ${req.originalUrl} on the server`, 404));

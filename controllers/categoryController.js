@@ -6,7 +6,7 @@ const AppError = require("../utils/AppError");
 
 const setCategoryIdToBody = (req, res, next) => {
   req.body.id = req.params.id;
-  delete req.params.categoryId;
+  delete req.params.id;
   next();
 };
 

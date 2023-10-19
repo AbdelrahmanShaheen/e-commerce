@@ -3,6 +3,7 @@ const express = require("express");
 const {
   updateProductValidator,
   productIdValidator,
+  createProductValidator,
 } = require("../utils/validators/productValidator");
 
 const {
@@ -16,7 +17,10 @@ const {
 
 const productRouter = express.Router();
 
-productRouter.route("/").post(createProduct).get(getProducts);
+productRouter
+  .route("/")
+  .post(createProductValidator, createProduct)
+  .get(getProducts);
 productRouter
   .route("/:id")
   .get(setProductIdToBody, productIdValidator, getProduct)

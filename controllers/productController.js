@@ -14,8 +14,10 @@ const setProductIdToBody = (req, res, next) => {
 //@access Public
 const getProduct = asyncHandler(async (req, res, next) => {
   const { id } = req.body;
-
-  const product = await Product.findById(id);
+  const product = await Product.findById(id).populate({
+    path: "category",
+    select: "name -_id",
+  });
   if (!product)
     return next(new AppError("Product with this id is not found", 404));
   res.status(200).send({ data: product });
@@ -49,7 +51,10 @@ const getProducts = asyncHandler(async (req, res) => {
       [parts[0]]: parts[1] === "desc" ? -1 : 1,
     };
   }
-  const products = await Product.find({}, null, options);
+  const products = await Product.find({}, null, options).populate({
+    path: "category",
+    select: "name -_id",
+  });
   res.status(200).send({ results: products.length, data: products });
 });
 //@desc Update product

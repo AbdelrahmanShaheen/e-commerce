@@ -49,7 +49,7 @@ const getCategories = asyncHandler(async (req, res) => {
     };
   }
   const categories = await Category.find({}, null, options);
-  res.status(200).send({ results: categories.length, data: categories });
+  res.status(200).send({ results: categories.length, page, data: categories });
 });
 //@desc Update category
 //@route PUT /api/v1/categories/:id

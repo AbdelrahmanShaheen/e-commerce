@@ -68,7 +68,9 @@ const getSubCategories = asyncHandler(async (req, res) => {
     null,
     options
   );
-  res.status(200).send({ results: subCategories.length, data: subCategories });
+  res
+    .status(200)
+    .send({ results: subCategories.length, page, data: subCategories });
 });
 
 //@desc Get a specific subCategory

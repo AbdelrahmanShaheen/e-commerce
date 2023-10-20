@@ -46,7 +46,7 @@ const getBrands = asyncHandler(async (req, res) => {
     };
   }
   const brands = await Brand.find({}, null, options);
-  res.status(200).send({ results: brands.length, data: brands });
+  res.status(200).send({ results: brands.length, page, data: brands });
 });
 //@desc Update brand
 //@route PUT /api/v1/brands/:id

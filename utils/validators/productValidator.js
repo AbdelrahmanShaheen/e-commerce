@@ -67,13 +67,24 @@ const updateProductValidator = [
     .notEmpty()
     .withMessage("Product must be belong to a category")
     .isMongoId()
-    .withMessage("Invalid ID formate"),
+    .withMessage("Invalid ID formate")
+    .custom(async (categoryId) => {
+      const category = await Category.findById(categoryId);
+      if (!category) throw new Error(`No category for this id: ${categoryId}`);
+    }),
   check("subcategories")
     .optional()
     .isArray()
     .withMessage("subcategories should be array of MongoID")
     .isMongoId()
-    .withMessage("Invalid ID formate"),
+    .withMessage("Invalid ID formate")
+    .custom(async (subcategoriesIds) => {
+      const subcategories = await SubCategory.find({
+        _id: { $in: subcategoriesIds, $exists: true },
+      });
+      if (subcategories.length !== subcategoriesIds.length)
+        throw new Error(`At least one subCategory does not exist in the DB`);
+    }),
   check("brand").optional().isMongoId().withMessage("Invalid ID formate"),
   check("ratingsAverage")
     .optional()
@@ -165,6 +176,22 @@ const createProductValidator = [
       });
       if (subcategories.length !== subcategoriesIds.length)
         throw new Error(`At least one subCategory does not exist in the DB`);
+    })
+    .custom(async (subcategoriesIds, { req }) => {
+      const subcategories = await SubCategory.find({
+        category: req.body.category,
+      });
+
+      const subcategoriesIdsInDB = subcategories.map((subCategory) =>
+        String(subCategory._id)
+      );
+      const validSubCategoriesIds = subcategoriesIds.every((subCategoryId) =>
+        subcategoriesIdsInDB.includes(subCategoryId)
+      );
+      if (!validSubCategoriesIds)
+        throw new Error(
+          "At least one subcategory does not belong to the category"
+        );
     }),
   check("brand").optional().isMongoId().withMessage("Invalid ID formate"),
   check("ratingsAverage")

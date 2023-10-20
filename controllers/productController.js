@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const SubCategory = require("../models/subCategory");
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
@@ -8,7 +9,6 @@ const setProductIdToBody = (req, res, next) => {
   delete req.params.id;
   next();
 };
-
 
 //@desc Get a specific product
 //@route GET /api/v1/products/:id
@@ -90,6 +90,21 @@ const updateProduct = asyncHandler(async (req, res, next) => {
   );
   if (!isValidOperation) return next(new AppError("invalid updates!", 400));
   //...........................................................
+  //Validate that all the subcategories belong to the category
+  const subcategories = await SubCategory.find({
+    category: product.category,
+  });
+
+  const subcategoriesIdsInDB = subcategories.map((subCategory) =>
+    String(subCategory._id)
+  );
+  const subcategoriesIds = product.subcategories;
+  const validSubCategoriesIds = subcategoriesIds.every((subCategoryId) =>
+    subcategoriesIdsInDB.includes(subCategoryId)
+  );
+  if (!validSubCategoriesIds)
+    throw new Error("At least one subcategory does not belong to the category");
+  //..................................................
   updates.forEach((update) => {
     product[update] = req.body[update];
   });

@@ -39,13 +39,12 @@ const createProduct = asyncHandler(async (req, res) => {
 //@access Public
 const getProducts = asyncHandler(async (req, res) => {
   const options = {};
-  if (req.query.page && req.query.limit) {
-    const page = parseInt(req.query.page);
-    const limit = parseInt(req.query.limit);
-    const skip = (page - 1) * limit;
-    options.skip = skip;
-    options.limit = limit;
-  }
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = (page - 1) * limit;
+  options.skip = skip;
+  options.limit = limit;
+
   if (req.query.sortBy) {
     const parts = req.query.sortBy.split(":");
     options.sort = {
@@ -56,7 +55,7 @@ const getProducts = asyncHandler(async (req, res) => {
     path: "category",
     select: "name -_id",
   });
-  res.status(200).send({ results: products.length, data: products });
+  res.status(200).send({ results: products.length, page, data: products });
 });
 //@desc Update product
 //@route PUT /api/v1/products/:id

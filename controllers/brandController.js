@@ -34,13 +34,11 @@ const createBrand = asyncHandler(async (req, res) => {
 //@access Public
 const getBrands = asyncHandler(async (req, res) => {
   const options = {};
-  if (req.query.page && req.query.limit) {
-    const page = parseInt(req.query.page);
-    const limit = parseInt(req.query.limit);
-    const skip = (page - 1) * limit;
-    options.skip = skip;
-    options.limit = limit;
-  }
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = (page - 1) * limit;
+  options.skip = skip;
+  options.limit = limit;
   if (req.query.sortBy) {
     const parts = req.query.sortBy.split(":");
     options.sort = {

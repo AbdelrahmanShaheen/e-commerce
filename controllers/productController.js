@@ -39,34 +39,57 @@ const createProduct = asyncHandler(async (req, res) => {
 //@access Public
 const getProducts = asyncHandler(async (req, res) => {
   const options = {};
-  //Pagination
+  let projection = "";
+  //1) Pagination
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 50;
   const skip = (page - 1) * limit;
   options.skip = skip;
   options.limit = limit;
-  //filtering
+  //2) filtering
   const queryStringObj = { ...req.query };
-  const excludesFields = ["sortBy", "page", "limit", "fields"];
+  const excludesFields = ["sortBy", "page", "limit", "fields", "keyword"];
   excludesFields.forEach((field) => delete queryStringObj[field]);
   let queryString = JSON.stringify(queryStringObj);
   queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, "$$$&");
 
-  //Sorting
+  //3) Sorting
   if (req.query.sortBy) {
-    const parts = req.query.sortBy.split(":");
-    options.sort = {
-      [parts[0]]: parts[1] === "desc" ? -1 : 1,
-    };
+    const sortObj = {};
+    const sortFields = req.query.sortBy.split(",");
+    sortFields.forEach((field) => {
+      const parts = field.split(":");
+      sortObj[parts[0]] = parts[1] === "desc" ? -1 : 1;
+    });
+    options.sort = { ...sortObj };
   }
+  //4) Field limiting
+  if (req.query.fields) {
+    projection = req.query.fields.split(",").join(" ");
+  } else {
+    projection = "-__v";
+  }
+  //5) Build query
   const mongooseQuery = Product.find(
     JSON.parse(queryString),
-    null,
+    projection,
     options
   ).populate({
     path: "category",
     select: "name -_id",
   });
+  //6) Keyword search
+  if (req.query.keyword) {
+    const { keyword } = req.query;
+    const query = {
+      $or: [
+        { title: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+      ],
+    };
+    mongooseQuery.find(query);
+  }
+  //7) Execute query
   const products = await mongooseQuery;
   res.status(200).send({ results: products.length, page, data: products });
 });

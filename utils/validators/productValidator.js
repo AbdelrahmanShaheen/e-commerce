@@ -1,4 +1,6 @@
 const { check } = require("express-validator");
+const Category = require("../../models/category");
+const SubCategory = require("../../models/subCategory");
 const validatorMiddleware = require("../../middlewares/validatorMiddleware");
 
 const updateProductValidator = [
@@ -41,8 +43,9 @@ const updateProductValidator = [
     .isNumeric()
     .withMessage("Product priceAfterDiscount must be a number")
     .toFloat()
-    .custom((value, { req }) => {
-      if (req.body.price <= value) {
+    .custom((priceAfterDiscount, { req }) => {
+      console.log(req.body, priceAfterDiscount);
+      if (req.body.price <= priceAfterDiscount) {
         throw new Error("priceAfterDiscount must be lower than price");
       }
       return true;
@@ -126,8 +129,8 @@ const createProductValidator = [
     .isNumeric()
     .withMessage("Product priceAfterDiscount must be a number")
     .toFloat()
-    .custom((value, { req }) => {
-      if (req.body.price <= value) {
+    .custom((priceAfterDiscount, { req }) => {
+      if (req.body.price <= priceAfterDiscount) {
         throw new Error("priceAfterDiscount must be lower than price");
       }
       return true;
@@ -145,13 +148,24 @@ const createProductValidator = [
     .notEmpty()
     .withMessage("Product must be belong to a category")
     .isMongoId()
-    .withMessage("Invalid ID formate"),
+    .withMessage("Invalid ID formate")
+    .custom(async (categoryId) => {
+      const category = await Category.findById(categoryId);
+      if (!category) throw new Error(`No category for this id: ${categoryId}`);
+    }),
   check("subcategories")
     .optional()
     .isArray()
     .withMessage("subcategories should be array of MongoID")
     .isMongoId()
-    .withMessage("Invalid ID formate"),
+    .withMessage("Invalid ID formate")
+    .custom(async (subcategoriesIds) => {
+      const subcategories = await SubCategory.find({
+        _id: { $in: subcategoriesIds, $exists: true },
+      });
+      if (subcategories.length !== subcategoriesIds.length)
+        throw new Error(`At least one subCategory does not exist in the DB`);
+    }),
   check("brand").optional().isMongoId().withMessage("Invalid ID formate"),
   check("ratingsAverage")
     .optional()

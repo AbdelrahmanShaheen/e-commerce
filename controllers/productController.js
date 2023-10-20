@@ -9,6 +9,7 @@ const setProductIdToBody = (req, res, next) => {
   next();
 };
 
+
 //@desc Get a specific product
 //@route GET /api/v1/products/:id
 //@access Public

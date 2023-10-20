@@ -39,22 +39,35 @@ const createProduct = asyncHandler(async (req, res) => {
 //@access Public
 const getProducts = asyncHandler(async (req, res) => {
   const options = {};
+  //Pagination
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 5;
+  const limit = parseInt(req.query.limit) || 50;
   const skip = (page - 1) * limit;
   options.skip = skip;
   options.limit = limit;
+  //filtering
+  const queryStringObj = { ...req.query };
+  const excludesFields = ["sortBy", "page", "limit", "fields"];
+  excludesFields.forEach((field) => delete queryStringObj[field]);
+  let queryString = JSON.stringify(queryStringObj);
+  queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, "$$$&");
 
+  //Sorting
   if (req.query.sortBy) {
     const parts = req.query.sortBy.split(":");
     options.sort = {
       [parts[0]]: parts[1] === "desc" ? -1 : 1,
     };
   }
-  const products = await Product.find({}, null, options).populate({
+  const mongooseQuery = Product.find(
+    JSON.parse(queryString),
+    null,
+    options
+  ).populate({
     path: "category",
     select: "name -_id",
   });
+  const products = await mongooseQuery;
   res.status(200).send({ results: products.length, page, data: products });
 });
 //@desc Update product

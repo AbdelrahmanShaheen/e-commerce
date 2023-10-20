@@ -3,6 +3,7 @@ const SubCategory = require("../models/subCategory");
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
+const ApiFeatures = require("../utils/apiFeatures");
 
 const setProductIdToBody = (req, res, next) => {
   req.body.id = req.params.id;
@@ -38,60 +39,13 @@ const createProduct = asyncHandler(async (req, res) => {
 //@route GET /api/v1/products
 //@access Public
 const getProducts = asyncHandler(async (req, res) => {
-  const options = {};
-  let projection = "";
-  //1) Pagination
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 50;
-  const skip = (page - 1) * limit;
-  options.skip = skip;
-  options.limit = limit;
-  //2) filtering
-  const queryStringObj = { ...req.query };
-  const excludesFields = ["sortBy", "page", "limit", "fields", "keyword"];
-  excludesFields.forEach((field) => delete queryStringObj[field]);
-  let queryString = JSON.stringify(queryStringObj);
-  queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, "$$$&");
-
-  //3) Sorting
-  if (req.query.sortBy) {
-    const sortObj = {};
-    const sortFields = req.query.sortBy.split(",");
-    sortFields.forEach((field) => {
-      const parts = field.split(":");
-      sortObj[parts[0]] = parts[1] === "desc" ? -1 : 1;
-    });
-    options.sort = { ...sortObj };
-  }
-  //4) Field limiting
-  if (req.query.fields) {
-    projection = req.query.fields.split(",").join(" ");
-  } else {
-    projection = "-__v";
-  }
-  //5) Build query
-  const mongooseQuery = Product.find(
-    JSON.parse(queryString),
-    projection,
-    options
-  ).populate({
+  const apiFeatures = new ApiFeatures(Product.find(), req.query);
+  apiFeatures.filter().limitFields().search().sort().paginate();
+  const products = await apiFeatures.mongooseQuery.populate({
     path: "category",
     select: "name -_id",
   });
-  //6) Keyword search
-  if (req.query.keyword) {
-    const { keyword } = req.query;
-    const query = {
-      $or: [
-        { title: { $regex: keyword, $options: "i" } },
-        { description: { $regex: keyword, $options: "i" } },
-      ],
-    };
-    mongooseQuery.find(query);
-  }
-  //7) Execute query
-  const products = await mongooseQuery;
-  res.status(200).send({ results: products.length, page, data: products });
+  res.status(200).send({ results: products.length, data: products });
 });
 //@desc Update product
 //@route PUT /api/v1/products/:id

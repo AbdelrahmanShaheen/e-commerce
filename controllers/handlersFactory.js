@@ -60,4 +60,28 @@ const getOne = (Model) =>
       return next(new AppError("document with this id is not found", 404));
     res.status(200).send({ data: document });
   });
-module.exports = { deleteOne, updateOne, createOne, getOne };
+
+const getAll = (Model, modelName = "") =>
+  asyncHandler(async (req, res) => {
+    let filterObj = {};
+    if (req.body.filterObj) filterObj = req.body.filterObj;
+    const apiFeatures = new ApiFeatures(
+      Model.find(req.body.filterObj),
+      req.query
+    );
+    const countDocuments = await Model.countDocuments();
+    apiFeatures
+      .filter()
+      .paginate(countDocuments)
+      .limitFields()
+      .search(modelName)
+      .sort();
+    const { mongooseQuery, paginationResult } = apiFeatures;
+    const documents = await mongooseQuery;
+    res.status(200).send({
+      results: documents.length,
+      paginationResult,
+      data: documents,
+    });
+  });
+module.exports = { deleteOne, updateOne, createOne, getOne, getAll };

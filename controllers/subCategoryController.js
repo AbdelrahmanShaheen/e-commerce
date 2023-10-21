@@ -1,9 +1,4 @@
-const Category = require("../models/category");
-const slugify = require("slugify");
-const asyncHandler = require("express-async-handler");
-const AppError = require("../utils/AppError");
 const SubCategory = require("../models/subCategory");
-const ApiFeatures = require("../utils/apiFeatures");
 const factory = require("./handlersFactory");
 //used for nested route (create)
 const setCategoryIdToBody = (req, res, next) => {
@@ -37,24 +32,7 @@ const createSubCategory = factory.createOne(SubCategory);
 //@desc Get list of subCategories
 //@route GET /api/v1/subCategories
 //@access Public
-const getSubCategories = asyncHandler(async (req, res) => {
-  const apiFeatures = new ApiFeatures(
-    SubCategory.find(req.body.filterObj),
-    req.query
-  );
-  const countDocuments = await SubCategory.countDocuments();
-  apiFeatures.filter().paginate(countDocuments).limitFields().search().sort();
-  const { mongooseQuery, paginationResult } = apiFeatures;
-  const subCategories = await mongooseQuery.populate({
-    path: "category",
-    select: "name -_id",
-  });
-  res.status(200).send({
-    results: subCategories.length,
-    paginationResult,
-    data: subCategories,
-  });
-});
+const getSubCategories = factory.getAll(SubCategory);
 
 //@desc Get a specific subCategory
 //@route GET /api/v1/subCategories/:id

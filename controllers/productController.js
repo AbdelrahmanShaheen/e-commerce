@@ -40,12 +40,16 @@ const createProduct = asyncHandler(async (req, res) => {
 //@access Public
 const getProducts = asyncHandler(async (req, res) => {
   const apiFeatures = new ApiFeatures(Product.find(), req.query);
-  apiFeatures.filter().limitFields().search().sort().paginate();
+  const countDocuments = await Product.countDocuments();
+  apiFeatures.filter().limitFields().search().sort().paginate(countDocuments);
   const products = await apiFeatures.mongooseQuery.populate({
     path: "category",
     select: "name -_id",
   });
-  res.status(200).send({ results: products.length, data: products });
+  const { paginationResult } = apiFeatures;
+  res
+    .status(200)
+    .send({ results: products.length, paginationResult, data: products });
 });
 //@desc Update product
 //@route PUT /api/v1/products/:id

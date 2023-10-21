@@ -4,6 +4,7 @@ const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
 const ApiFeatures = require("../utils/apiFeatures");
+const factory = require("./handlersFactory");
 
 const setProductIdToBody = (req, res, next) => {
   req.body.id = req.params.id;
@@ -114,14 +115,8 @@ const updateProduct = asyncHandler(async (req, res, next) => {
 //@desc Delete product
 //@route POST /api/v1/products/:id
 //@access Private
-const deleteProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.body;
+const deleteProduct = factory.deleteOne(Product);
 
-  const product = await Product.findByIdAndRemove(id);
-  if (!product)
-    return next(new AppError("Product with this id is not found", 404));
-  res.status(204).send();
-});
 module.exports = {
   getProduct,
   createProduct,

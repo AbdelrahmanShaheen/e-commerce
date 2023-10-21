@@ -3,6 +3,7 @@ const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
 const ApiFeatures = require("../utils/apiFeatures");
+const factory = require("./handlersFactory");
 const setCategoryIdToBody = (req, res, next) => {
   req.body.id = req.params.id;
   delete req.params.id;
@@ -69,14 +70,7 @@ const updateCategory = asyncHandler(async (req, res, next) => {
 //@desc Delete category
 //@route POST /api/v1/categories/:id
 //@access Private
-const deleteCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.body;
-
-  const category = await Category.findByIdAndRemove(id);
-  if (!category)
-    return next(new AppError("Category with this id is not found", 404));
-  res.status(204).send();
-});
+const deleteCategory = factory.deleteOne(Category);
 module.exports = {
   getCategory,
   createCategory,

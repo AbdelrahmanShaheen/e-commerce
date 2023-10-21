@@ -3,8 +3,9 @@ const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
 const ApiFeatures = require("../utils/apiFeatures");
+const factory = require("./handlersFactory");
 const setBrandIdToBody = (req, res, next) => {
-  req.body.brandId = req.params.id;
+  req.body.id = req.params.id;
   next();
 };
 
@@ -12,8 +13,8 @@ const setBrandIdToBody = (req, res, next) => {
 //@route GET /api/v1/brands/:id
 //@access Public
 const getBrand = asyncHandler(async (req, res, next) => {
-  const { brandId } = req.body;
-  const brand = await Brand.findById(brandId);
+  const { id } = req.body;
+  const brand = await Brand.findById(id);
   if (!brand) return next(new AppError("Brand with this id is not found", 404));
   res.status(200).send({ data: brand });
 });
@@ -45,9 +46,9 @@ const getBrands = asyncHandler(async (req, res) => {
 //@route PUT /api/v1/brands/:id
 //@access Private
 const updateBrand = asyncHandler(async (req, res, next) => {
-  const { brandId } = req.body;
+  const { id } = req.body;
   const { name } = req.body;
-  const brand = await Brand.findById(brandId);
+  const brand = await Brand.findById(id);
   if (!brand) return next(new AppError("Brand with this id is not found", 404));
   //check if there is a brand with this name is exists.....
   const duplicateBrand = await Brand.findOne({ name });
@@ -62,13 +63,7 @@ const updateBrand = asyncHandler(async (req, res, next) => {
 //@desc Delete brand
 //@route POST /api/v1/brands/:id
 //@access Private
-const deleteBrand = asyncHandler(async (req, res, next) => {
-  const { brandId } = req.body;
-  const brand = await Brand.findByIdAndRemove(brandId);
-  if (!brand)
-    return next(new AppError("Category with this id is not found", 404));
-  res.status(204).send();
-});
+const deleteBrand = factory.deleteOne(Brand);
 module.exports = {
   getBrand,
   createBrand,

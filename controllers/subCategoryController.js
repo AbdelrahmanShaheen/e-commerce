@@ -4,6 +4,8 @@ const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
 const SubCategory = require("../models/subCategory");
 const ApiFeatures = require("../utils/apiFeatures");
+const factory = require("./handlersFactory");
+
 const setCategoryIdToBody = (req, res, next) => {
   req.body.category = req.params.categoryId;
   delete req.params.categoryId;
@@ -120,13 +122,8 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
 //@desc Delete category
 //@route POST /api/v1/categories/:id
 //@access Private
-const deleteSubCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.body;
-  const subCategory = await SubCategory.findByIdAndRemove(id);
-  if (!subCategory)
-    return next(new AppError("subCategory with this id is not found", 404));
-  res.status(204).send();
-});
+const deleteSubCategory = factory.deleteOne(SubCategory);
+
 module.exports = {
   createSubCategory,
   getSubCategories,

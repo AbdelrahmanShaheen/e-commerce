@@ -1,9 +1,8 @@
 const Category = require("../models/category");
-const ObjectID = require("mongoose").Types.ObjectId;
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
-
+const ApiFeatures = require("../utils/apiFeatures");
 const setCategoryIdToBody = (req, res, next) => {
   req.body.id = req.params.id;
   delete req.params.id;
@@ -36,20 +35,14 @@ const createCategory = asyncHandler(async (req, res) => {
 //@route GET /api/v1/categories
 //@access Public
 const getCategories = asyncHandler(async (req, res) => {
-  const options = {};
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 5;
-  const skip = (page - 1) * limit;
-  options.skip = skip;
-  options.limit = limit;
-  if (req.query.sortBy) {
-    const parts = req.query.sortBy.split(":");
-    options.sort = {
-      [parts[0]]: parts[1] === "desc" ? -1 : 1,
-    };
-  }
-  const categories = await Category.find({}, null, options);
-  res.status(200).send({ results: categories.length, page, data: categories });
+  const apiFeatures = new ApiFeatures(Category.find(), req.query);
+  const countDocuments = await Category.countDocuments();
+  apiFeatures.filter().paginate(countDocuments).limitFields().search().sort();
+  const { mongooseQuery, paginationResult } = apiFeatures;
+  const categories = await mongooseQuery;
+  res
+    .status(200)
+    .send({ results: categories.length, paginationResult, data: categories });
 });
 //@desc Update category
 //@route PUT /api/v1/categories/:id

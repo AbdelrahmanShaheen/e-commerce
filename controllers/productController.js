@@ -41,12 +41,18 @@ const createProduct = asyncHandler(async (req, res) => {
 const getProducts = asyncHandler(async (req, res) => {
   const apiFeatures = new ApiFeatures(Product.find(), req.query);
   const countDocuments = await Product.countDocuments();
-  apiFeatures.filter().limitFields().search().sort().paginate(countDocuments);
-  const products = await apiFeatures.mongooseQuery.populate({
+  apiFeatures
+    .filter()
+    .limitFields()
+    .search("Product")
+    .sort()
+    .paginate(countDocuments);
+  const { paginationResult, mongooseQuery } = apiFeatures;
+  const products = await mongooseQuery.populate({
     path: "category",
     select: "name -_id",
   });
-  const { paginationResult } = apiFeatures;
+
   res
     .status(200)
     .send({ results: products.length, paginationResult, data: products });

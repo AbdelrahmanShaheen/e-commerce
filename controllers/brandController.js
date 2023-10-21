@@ -1,9 +1,8 @@
 const Brand = require("../models/brand");
-const ObjectID = require("mongoose").Types.ObjectId;
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
-
+const ApiFeatures = require("../utils/apiFeatures");
 const setBrandIdToBody = (req, res, next) => {
   req.body.brandId = req.params.id;
   next();
@@ -33,20 +32,14 @@ const createBrand = asyncHandler(async (req, res) => {
 //@route GET /api/v1/brands
 //@access Public
 const getBrands = asyncHandler(async (req, res) => {
-  const options = {};
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 5;
-  const skip = (page - 1) * limit;
-  options.skip = skip;
-  options.limit = limit;
-  if (req.query.sortBy) {
-    const parts = req.query.sortBy.split(":");
-    options.sort = {
-      [parts[0]]: parts[1] === "desc" ? -1 : 1,
-    };
-  }
-  const brands = await Brand.find({}, null, options);
-  res.status(200).send({ results: brands.length, page, data: brands });
+  const apiFeatures = new ApiFeatures(Brand.find(), req.query);
+  const countDocuments = await Brand.countDocuments();
+  apiFeatures.filter().paginate(countDocuments).limitFields().search().sort();
+  const { mongooseQuery, paginationResult } = apiFeatures;
+  const brands = await mongooseQuery;
+  res
+    .status(200)
+    .send({ results: brands.length, paginationResult, data: brands });
 });
 //@desc Update brand
 //@route PUT /api/v1/brands/:id

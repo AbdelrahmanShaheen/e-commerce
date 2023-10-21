@@ -13,16 +13,13 @@ const setBrandIdToBody = (req, res, next) => {
 //@desc Get a specific brand
 //@route GET /api/v1/brands/:id
 //@access Public
-const getBrand = asyncHandler(async (req, res, next) => {
-  const { id } = req.body;
-  const brand = await Brand.findById(id);
-  if (!brand) return next(new AppError("Brand with this id is not found", 404));
-  res.status(200).send({ data: brand });
-});
+const getBrand = factory.getOne(Brand);
+
 //@desc Create brand
 //@route POST /api/v1/brands
 //@access Private
 const createBrand = factory.createOne(Brand);
+
 //@desc Get list of brands
 //@route GET /api/v1/brands
 //@access Public

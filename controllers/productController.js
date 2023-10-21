@@ -14,16 +14,7 @@ const setProductIdToBody = (req, res, next) => {
 //@desc Get a specific product
 //@route GET /api/v1/products/:id
 //@access Public
-const getProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.body;
-  const product = await Product.findById(id).populate({
-    path: "category",
-    select: "name -_id",
-  });
-  if (!product)
-    return next(new AppError("Product with this id is not found", 404));
-  res.status(200).send({ data: product });
-});
+const getProduct = factory.getOne(Product);
 //@desc Create product
 //@route POST /api/v1/products
 //@access Private

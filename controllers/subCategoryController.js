@@ -59,13 +59,7 @@ const getSubCategories = asyncHandler(async (req, res) => {
 //@desc Get a specific subCategory
 //@route GET /api/v1/subCategories/:id
 //@access Public
-const getSubCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.body;
-  const subCategory = await SubCategory.findById(id);
-  if (!subCategory)
-    return next(new AppError("subCategory with this id is not found", 404));
-  res.status(200).send({ data: subCategory });
-});
+const getSubCategory = factory.getOne(SubCategory);
 
 //@desc Update category
 //@route PUT /api/v1/categories/:id

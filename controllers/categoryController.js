@@ -13,14 +13,7 @@ const setCategoryIdToBody = (req, res, next) => {
 //@desc Get a specific category
 //@route GET /api/v1/categories/:id
 //@access Public
-const getCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.body;
-
-  const category = await Category.findById(id);
-  if (!category)
-    return next(new AppError("Category with this id is not found", 404));
-  res.status(200).send({ data: category });
-});
+const getCategory = factory.getOne(Category);
 //@desc Create category
 //@route POST /api/v1/categories
 //@access Private

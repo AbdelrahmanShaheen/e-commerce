@@ -1,9 +1,36 @@
 const { check } = require("express-validator");
 const Category = require("../../models/category");
 const SubCategory = require("../../models/subCategory");
+const Product = require("../../models/product");
 const validatorMiddleware = require("../../middlewares/validatorMiddleware");
 
+const belongsToCategory = async (subcategoriesIds, req) => {
+  const product = await Product.findById(req.body.id);
+  const subcategories = await SubCategory.find({
+    category: product.category,
+  });
+
+  const subcategoriesIdsInDB = subcategories.map((subCategory) =>
+    String(subCategory._id)
+  );
+  const validSubCategoriesIds = subcategoriesIds.every((subCategoryId) =>
+    subcategoriesIdsInDB.includes(subCategoryId)
+  );
+  if (!validSubCategoriesIds)
+    throw new Error("At least one subcategory does not belong to the category");
+};
+const existsInDB = async (subcategoriesIds) => {
+  const subcategories = await SubCategory.find({
+    _id: { $in: subcategoriesIds, $exists: true },
+  });
+  if (subcategories.length !== subcategoriesIds.length)
+    throw new Error(`At least one subCategory does not exist in the DB`);
+};
+
 const updateProductValidator = [
+  check("id")
+    .isMongoId()
+    .withMessage("product with that invalid id does not exist!"),
   check("title")
     .optional()
     .notEmpty()
@@ -44,7 +71,6 @@ const updateProductValidator = [
     .withMessage("Product priceAfterDiscount must be a number")
     .toFloat()
     .custom((priceAfterDiscount, { req }) => {
-      console.log(req.body, priceAfterDiscount);
       if (req.body.price <= priceAfterDiscount) {
         throw new Error("priceAfterDiscount must be lower than price");
       }
@@ -79,11 +105,10 @@ const updateProductValidator = [
     .isMongoId()
     .withMessage("Invalid ID formate")
     .custom(async (subcategoriesIds) => {
-      const subcategories = await SubCategory.find({
-        _id: { $in: subcategoriesIds, $exists: true },
-      });
-      if (subcategories.length !== subcategoriesIds.length)
-        throw new Error(`At least one subCategory does not exist in the DB`);
+      await existsInDB(subcategoriesIds);
+    })
+    .custom(async (subcategoriesIds, { req }) => {
+      await belongsToCategory(subcategoriesIds, req);
     }),
   check("brand").optional().isMongoId().withMessage("Invalid ID formate"),
   check("ratingsAverage")
@@ -98,9 +123,7 @@ const updateProductValidator = [
     .optional()
     .isNumeric()
     .withMessage("ratingsQuantity must be a number"),
-  check("id")
-    .isMongoId()
-    .withMessage("product with that invalid id does not exist!"),
+
   validatorMiddleware,
 ];
 
@@ -171,27 +194,10 @@ const createProductValidator = [
     .isMongoId()
     .withMessage("Invalid ID formate")
     .custom(async (subcategoriesIds) => {
-      const subcategories = await SubCategory.find({
-        _id: { $in: subcategoriesIds, $exists: true },
-      });
-      if (subcategories.length !== subcategoriesIds.length)
-        throw new Error(`At least one subCategory does not exist in the DB`);
+      await existsInDB(subcategoriesIds);
     })
     .custom(async (subcategoriesIds, { req }) => {
-      const subcategories = await SubCategory.find({
-        category: req.body.category,
-      });
-
-      const subcategoriesIdsInDB = subcategories.map((subCategory) =>
-        String(subCategory._id)
-      );
-      const validSubCategoriesIds = subcategoriesIds.every((subCategoryId) =>
-        subcategoriesIdsInDB.includes(subCategoryId)
-      );
-      if (!validSubCategoriesIds)
-        throw new Error(
-          "At least one subcategory does not belong to the category"
-        );
+      await belongsToCategory(subcategoriesIds, req);
     }),
   check("brand").optional().isMongoId().withMessage("Invalid ID formate"),
   check("ratingsAverage")

@@ -81,43 +81,8 @@ const getSubCategory = asyncHandler(async (req, res, next) => {
 //@desc Update category
 //@route PUT /api/v1/categories/:id
 //@access Private
-const updateSubCategory = asyncHandler(async (req, res, next) => {
-  const { id, name, category } = req.body;
-  const subCategory = await SubCategory.findById(id);
-
-  if (!subCategory)
-    return next(new AppError("subCategory with this id is not found", 404));
-  //handle error when updating by field that does not exist in the subCategory
-  const allowedUpdates = ["name", "category"];
-  delete req.body.id;
-  const updates = Object.keys(req.body);
-  const isValidOperation = updates.every((update) =>
-    allowedUpdates.includes(update)
-  );
-  if (!isValidOperation) return next(new AppError("invalid updates!", 400));
-  //if categoryId entered to be changed
-  if (category) {
-    const categoryObj = await Category.findById(category);
-    if (!categoryObj)
-      return next(new AppError("Category with this id is not found", 404));
-    else subCategory["category"] = category;
-  }
-  //if name entered to be changed
-  if (name) {
-    const duplicateSubCategory = await SubCategory.findOne({ name });
-    //check if there is a subCategory with this name is exists.....
-    if (duplicateSubCategory)
-      return next(
-        new AppError("Duplicate! subCategory with this name exists!", 400)
-      );
-    else {
-      subCategory["name"] = name;
-      subCategory["slug"] = slugify(name);
-    }
-  }
-  subCategory.save();
-  res.status(200).send({ data: subCategory });
-});
+const allowedUpdates = ["name", "category"];
+const updateSubCategory = factory.updateOne(SubCategory, allowedUpdates);
 
 //@desc Delete category
 //@route POST /api/v1/categories/:id

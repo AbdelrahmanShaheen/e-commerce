@@ -48,25 +48,9 @@ const getCategories = asyncHandler(async (req, res) => {
 //@desc Update category
 //@route PUT /api/v1/categories/:id
 //@access Private
-const updateCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.body;
+const allowedUpdates = ["name"];
+const updateCategory = factory.updateOne(Category, allowedUpdates);
 
-  const { name } = req.body;
-  const category = await Category.findById(id);
-  if (!category)
-    return next(new AppError("Category with this id is not found", 404));
-  //check if there is a category with this name is exists.....
-  const duplicateCategory = await Category.findOne({ name });
-  if (duplicateCategory)
-    return next(
-      new AppError("Duplicate! category with this name exists!", 400)
-    );
-  //...........................................................
-  category["name"] = name;
-  category["slug"] = slugify(name);
-  category.save();
-  res.status(200).send({ data: category });
-});
 //@desc Delete category
 //@route POST /api/v1/categories/:id
 //@access Private

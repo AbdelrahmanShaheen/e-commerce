@@ -1,5 +1,4 @@
 const Product = require("../models/product");
-const SubCategory = require("../models/subCategory");
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
@@ -61,57 +60,23 @@ const getProducts = asyncHandler(async (req, res) => {
 //@desc Update product
 //@route PUT /api/v1/products/:id
 //@access Private
-const updateProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.body;
-  const product = await Product.findById(id);
-  if (!product)
-    return next(new AppError("Product with this id is not found", 404));
-  //handle error when updating by field that does not exist in the product
-  const allowedUpdates = [
-    "title",
-    "description",
-    "quantity",
-    "sold",
-    "price",
-    "priceAfterDiscount",
-    "colors",
-    "imageCover",
-    "images",
-    "category",
-    "subcategories",
-    "brand",
-    "ratingsAverage",
-    "ratingsQuantity",
-  ];
-  delete req.body.id;
-  const updates = Object.keys(req.body);
-  const isValidOperation = updates.every((update) =>
-    allowedUpdates.includes(update)
-  );
-  if (!isValidOperation) return next(new AppError("invalid updates!", 400));
-  //...........................................................
-  //Validate that all the subcategories belong to the category
-  const subcategories = await SubCategory.find({
-    category: product.category,
-  });
-
-  const subcategoriesIdsInDB = subcategories.map((subCategory) =>
-    String(subCategory._id)
-  );
-  const subcategoriesIds = product.subcategories;
-  const validSubCategoriesIds = subcategoriesIds.every((subCategoryId) =>
-    subcategoriesIdsInDB.includes(subCategoryId)
-  );
-  if (!validSubCategoriesIds)
-    throw new Error("At least one subcategory does not belong to the category");
-  //..................................................
-  updates.forEach((update) => {
-    product[update] = req.body[update];
-  });
-  if (req.body.title) product["slug"] = slugify(title);
-  product.save();
-  res.status(200).send({ data: product });
-});
+const allowedUpdates = [
+  "title",
+  "description",
+  "quantity",
+  "sold",
+  "price",
+  "priceAfterDiscount",
+  "colors",
+  "imageCover",
+  "images",
+  "category",
+  "subcategories",
+  "brand",
+  "ratingsAverage",
+  "ratingsQuantity",
+];
+const updateProduct = factory.updateOne(Product, allowedUpdates);
 //@desc Delete product
 //@route POST /api/v1/products/:id
 //@access Private

@@ -24,14 +24,7 @@ const getCategory = asyncHandler(async (req, res, next) => {
 //@desc Create category
 //@route POST /api/v1/categories
 //@access Private
-const createCategory = asyncHandler(async (req, res) => {
-  const { name } = req.body;
-  let slug;
-  if (name) slug = slugify(name);
-  const newCategory = new Category({ name, slug });
-  await newCategory.save();
-  res.status(201).send({ data: newCategory });
-});
+const createCategory = factory.createOne(Category);
 //@desc Get list of categories
 //@route GET /api/v1/categories
 //@access Public

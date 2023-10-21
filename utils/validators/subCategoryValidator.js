@@ -26,7 +26,11 @@ const categoryIdValidator = [
   check("category")
     .optional()
     .isMongoId()
-    .withMessage("Category with that invalid id does not exist!"),
+    .withMessage("Category with that invalid id does not exist!")
+    .custom(async (categoryId) => {
+      const category = await Category.findById(categoryId);
+      if (!category) throw new Error("Category with this id is not found");
+    }),
   validatorMiddleware,
 ];
 

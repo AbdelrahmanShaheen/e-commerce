@@ -22,14 +22,7 @@ const getBrand = asyncHandler(async (req, res, next) => {
 //@desc Create brand
 //@route POST /api/v1/brands
 //@access Private
-const createBrand = asyncHandler(async (req, res) => {
-  const { name } = req.body;
-  let slug;
-  if (name) slug = slugify(name);
-  const newBrand = new Brand({ name, slug });
-  await newBrand.save();
-  res.status(201).send({ data: newBrand });
-});
+const createBrand = factory.createOne(Brand);
 //@desc Get list of brands
 //@route GET /api/v1/brands
 //@access Public

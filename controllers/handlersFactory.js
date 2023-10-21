@@ -42,4 +42,13 @@ const updateOne = (Model, allowedUpdates) =>
     document.save();
     res.status(200).send({ data: document });
   });
-module.exports = { deleteOne, updateOne };
+
+const createOne = (Model) =>
+  asyncHandler(async (req, res) => {
+    const { title, name } = req.body;
+    if (title || name) req.body.slug = slugify(title || name);
+    const document = new Model(req.body);
+    await document.save();
+    res.status(201).send({ data: document });
+  });
+module.exports = { deleteOne, updateOne, createOne };

@@ -5,7 +5,7 @@ const AppError = require("../utils/AppError");
 const SubCategory = require("../models/subCategory");
 const ApiFeatures = require("../utils/apiFeatures");
 const factory = require("./handlersFactory");
-
+//used for nested route (create)
 const setCategoryIdToBody = (req, res, next) => {
   req.body.category = req.params.categoryId;
   delete req.params.categoryId;
@@ -17,13 +17,13 @@ const setSubCategoryIdToBody = (req, res, next) => {
   delete req.params.id;
   next();
 };
-
+//used for nested route (get)
 const setFilterObjToBody = (req, res, next) => {
   const { categoryId } = req.params;
-  const filterObj = {};
+  let filterObj = {};
   if (categoryId) {
     req.body.category = categoryId;
-    filterObj.category = categoryId;
+    filterObj = { category: categoryId };
   }
   req.body.filterObj = filterObj;
   delete req.params.categoryId;
@@ -32,27 +32,16 @@ const setFilterObjToBody = (req, res, next) => {
 //@desc Create subCategory
 //@route POST /api/v1/subCategories
 //@access Private
-const createSubCategory = asyncHandler(async (req, res, next) => {
-  const { name, category } = req.body;
-  const categoryObj = await Category.findById(category);
-  if (!categoryObj)
-    return next(new AppError("Category with this id is not found", 404));
-  let slug;
-  if (name) slug = slugify(name);
-  const newSubCategory = new SubCategory({
-    name,
-    slug,
-    category,
-  });
-  await newSubCategory.save();
-  res.status(201).send({ data: newSubCategory });
-});
+const createSubCategory = factory.createOne(SubCategory);
 
 //@desc Get list of subCategories
 //@route GET /api/v1/subCategories
 //@access Public
 const getSubCategories = asyncHandler(async (req, res) => {
-  const apiFeatures = new ApiFeatures(SubCategory.find(), req.query);
+  const apiFeatures = new ApiFeatures(
+    SubCategory.find(req.body.filterObj),
+    req.query
+  );
   const countDocuments = await SubCategory.countDocuments();
   apiFeatures.filter().paginate(countDocuments).limitFields().search().sort();
   const { mongooseQuery, paginationResult } = apiFeatures;

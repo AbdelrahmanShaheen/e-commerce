@@ -27,14 +27,7 @@ const getProduct = asyncHandler(async (req, res, next) => {
 //@desc Create product
 //@route POST /api/v1/products
 //@access Private
-const createProduct = asyncHandler(async (req, res) => {
-  const { title } = req.body;
-  if (title) req.body.slug = slugify(title);
-
-  const newProduct = new Product(req.body);
-  await newProduct.save();
-  res.status(201).send({ data: newProduct });
-});
+const createProduct = factory.createOne(Product);
 //@desc Get list of products
 //@route GET /api/v1/products
 //@access Public

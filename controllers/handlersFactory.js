@@ -55,7 +55,7 @@ const createOne = (Model) =>
 const getOne = (Model) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.body;
-    const document = await Model.findById(id);
+    const document = await Model.findOne({ _id: id });
     if (!document)
       return next(new AppError("document with this id is not found", 404));
     res.status(200).send({ data: document });

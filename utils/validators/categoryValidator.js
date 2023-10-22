@@ -3,8 +3,7 @@ const validatorMiddleware = require("../../middlewares/validatorMiddleware");
 
 const updateCategoryValidator = [
   check("name")
-    .notEmpty()
-    .withMessage("A category must have a name")
+    .optional()
     .isLength({ min: 3 })
     .withMessage("A category name must have at least 3 characters")
     .isLength({ max: 32 })

@@ -45,6 +45,8 @@ const resizeImage = asyncHandler(async (req, res, next) => {
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
     .toFile(`uploads/categories/${filename}`);
+  //save image name into DB.
+  req.body.image = filename;
   next();
 });
 
@@ -66,7 +68,7 @@ const getCategories = factory.getAll(Category);
 //@desc Update category
 //@route PUT /api/v1/categories/:id
 //@access Private
-const allowedUpdates = ["name"];
+const allowedUpdates = ["name", "image"];
 const updateCategory = factory.updateOne(Category, allowedUpdates);
 
 //@desc Delete category

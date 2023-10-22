@@ -27,6 +27,12 @@ categoryRouter
 categoryRouter
   .route("/:id")
   .get(setCategoryIdToBody, categoryIdValidator, getCategory)
-  .put(setCategoryIdToBody, updateCategoryValidator, updateCategory)
+  .put(
+    uploadCategoryImage,
+    resizeImage,
+    setCategoryIdToBody,
+    updateCategoryValidator,
+    updateCategory
+  )
   .delete(setCategoryIdToBody, categoryIdValidator, deleteCategory);
 module.exports = categoryRouter;

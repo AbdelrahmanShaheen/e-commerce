@@ -1,42 +1,18 @@
 const asyncHandler = require("express-async-handler");
 const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
-const multer = require("multer");
 
-const Category = require("../models/category");
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const factory = require("./handlersFactory");
-const AppError = require("../utils/AppError");
+const Category = require("../models/category");
 
 const setCategoryIdToBody = (req, res, next) => {
   req.body.id = req.params.id;
   delete req.params.id;
   next();
 };
-
-//file upload config
-const fileFilter = function (req, file, cb) {
-  if (file.mimetype.startsWith("image")) {
-    cb(null, true);
-  } else {
-    cb(new AppError("Only images allowed", 400), false);
-  }
-};
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "uploads/categories");
-//   },
-//   filename: function (req, file, cb) {
-//     const ext = file.originalname.split(".")[1];
-//     const filename = `category-${uuidv4()}-${Date.now()}.${ext}`;
-//     cb(null, filename);
-//   },
-// });
-const storage = multer.memoryStorage();
-
-const upload = multer({ storage, fileFilter });
-
 // Upload single image
-const uploadCategoryImage = upload.single("image");
+const uploadCategoryImage = uploadSingleImage("image");
 
 const resizeImage = asyncHandler(async (req, res, next) => {
   const filename = `category-${uuidv4()}-${Date.now()}.jpeg`;

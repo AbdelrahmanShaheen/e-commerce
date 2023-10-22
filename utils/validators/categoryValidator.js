@@ -10,7 +10,6 @@ const updateCategoryValidator = [
     .isLength({ max: 32 })
     .withMessage("A category name must have at most 32 characters"),
   check("id")
-    .optional()
     .isMongoId()
     .withMessage("Category with that invalid id does not exist!"),
   validatorMiddleware,

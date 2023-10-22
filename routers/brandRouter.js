@@ -11,15 +11,25 @@ const {
   updateBrand,
   deleteBrand,
   setBrandIdToBody,
+  uploadCategoryImage,
+  resizeImage,
 } = require("../controllers/brandController");
 
-const app = express();
 const brandRouter = express.Router();
 
-brandRouter.route("/").post(createBrand).get(getBrands);
+brandRouter
+  .route("/")
+  .post(uploadCategoryImage, resizeImage, createBrand)
+  .get(getBrands);
 brandRouter
   .route("/:id")
   .get(setBrandIdToBody, brandIdValidator, getBrand)
-  .put(setBrandIdToBody, updateBrandValidator, updateBrand)
+  .put(
+    uploadCategoryImage,
+    resizeImage,
+    setBrandIdToBody,
+    updateBrandValidator,
+    updateBrand
+  )
   .delete(setBrandIdToBody, brandIdValidator, deleteBrand);
 module.exports = brandRouter;

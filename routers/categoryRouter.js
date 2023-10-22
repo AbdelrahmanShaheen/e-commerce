@@ -12,6 +12,7 @@ const {
   deleteCategory,
   setCategoryIdToBody,
   uploadCategoryImage,
+  resizeImage,
 } = require("../controllers/categoryController.js");
 const subCategoryRouter = require("./subCategoryRouter.js");
 
@@ -21,7 +22,7 @@ categoryRouter.use("/:categoryId/subCategories", subCategoryRouter);
 
 categoryRouter
   .route("/")
-  .post(uploadCategoryImage, createCategory)
+  .post(uploadCategoryImage, resizeImage, createCategory)
   .get(getCategories);
 categoryRouter
   .route("/:id")

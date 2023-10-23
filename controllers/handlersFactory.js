@@ -15,9 +15,6 @@ const deleteOne = (Model) =>
 const updateOne = (Model, allowedUpdates) =>
   asyncHandler(async (req, res, next) => {
     const { id, name, title } = req.body;
-    const document = await Model.findById(id);
-    if (!document)
-      return next(new AppError("Document with this id is not found", 404));
     delete req.body.id;
     //handle error when updating by field that does not exist in the document
     const updates = Object.keys(req.body);
@@ -34,12 +31,14 @@ const updateOne = (Model, allowedUpdates) =>
           new AppError("Duplicate! document with this name exists!", 400)
         );
     }
-    //..............................
-    updates.forEach((update) => {
-      document[update] = req.body[update];
+
+    if (title || name) req.body["slug"] = slugify(title || name);
+    const document = await Model.findOneAndUpdate({ _id: id }, req.body, {
+      new: true,
     });
-    if (title || name) document["slug"] = slugify(title || name);
-    document.save();
+    if (!document)
+      return next(new AppError("Document with this id is not found", 404));
+
     res.status(200).send({ data: document });
   });
 

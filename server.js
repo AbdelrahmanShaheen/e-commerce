@@ -1,8 +1,12 @@
+const path = require("path");
+
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 require("./db/mongoose.js");
 
+const express = require("express");
 const morgan = require("morgan");
+
 const AppError = require("./utils/AppError.js");
 const globalErrorHandler = require("./middlewares/errorMiddleware.js");
 //routers
@@ -11,11 +15,12 @@ const subCategoryRouter = require("./routers/subCategoryRouter.js");
 const brandRouter = require("./routers/brandRouter.js");
 const productRouter = require("./routers/productRouter.js");
 //.............
-const express = require("express");
 const app = express();
 
 //Middlewares
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "uploads")));
+
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }

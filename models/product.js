@@ -70,6 +70,30 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+const setImgUrl = (doc) => {
+  if (doc.images) {
+    const imgs = [];
+    doc.images.forEach((image) => {
+      const imgUrl = process.env.BASE_URL + "/products/" + image;
+      imgs.push(imgUrl);
+    });
+    doc.images = imgs;
+  }
+  if (doc.imageCover) {
+    const imgUrl = process.env.BASE_URL + "/products/" + doc.imageCover;
+    doc.imageCover = imgUrl;
+  }
+};
+
+//After create/save query
+productSchema.post("save", function (doc) {
+  setImgUrl(doc);
+});
+//After getOne ,getAll ,update--> find query
+productSchema.post("init", function (doc) {
+  setImgUrl(doc);
+});
+
 productSchema.pre(["find", "findOne"], function (next) {
   this.populate({
     path: "category",

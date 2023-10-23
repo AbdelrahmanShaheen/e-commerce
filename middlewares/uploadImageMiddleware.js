@@ -1,7 +1,7 @@
 const multer = require("multer");
 const AppError = require("../utils/AppError");
 
-const uploadSingleImage = (fieldName) => {
+const multerOptions = () => {
   const storage = multer.memoryStorage();
   //file upload config
   const fileFilter = function (req, file, cb) {
@@ -12,8 +12,17 @@ const uploadSingleImage = (fieldName) => {
     }
   };
   const upload = multer({ storage, fileFilter });
-
+  return upload;
+};
+const uploadSingleImage = (fieldName) => {
+  const upload = multerOptions();
   // Upload single image
   return upload.single(fieldName);
 };
-module.exports = { uploadSingleImage };
+
+const uploadMixOfImages = (arrayOfFields) => {
+  const upload = multerOptions();
+  // Upload single or multiple images
+  return upload.fields(arrayOfFields);
+};
+module.exports = { uploadSingleImage, uploadMixOfImages };

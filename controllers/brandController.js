@@ -1,8 +1,8 @@
 const asyncHandler = require("express-async-handler");
 const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
-const factory = require("./handlersFactory");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
+const factory = require("./handlersFactory");
 const Brand = require("../models/brand");
 
 const setBrandIdToBody = (req, res, next) => {

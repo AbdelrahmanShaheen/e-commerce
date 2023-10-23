@@ -26,6 +26,12 @@ productRouter
 productRouter
   .route("/:id")
   .get(setProductIdToBody, productIdValidator, getProduct)
-  .put(setProductIdToBody, updateProductValidator, updateProduct)
+  .put(
+    uploadProductImage,
+    resizeImage,
+    setProductIdToBody,
+    updateProductValidator,
+    updateProduct
+  )
   .delete(setProductIdToBody, productIdValidator, deleteProduct);
 module.exports = productRouter;

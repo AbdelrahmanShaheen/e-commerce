@@ -15,14 +15,16 @@ const setBrandIdToBody = (req, res, next) => {
 const uploadCategoryImage = uploadSingleImage("image");
 
 const resizeImage = asyncHandler(async (req, res, next) => {
-  const filename = `brand-${uuidv4()}-${Date.now()}.jpeg`;
-  await sharp(req.file.buffer)
-    .resize(600, 600)
-    .toFormat("jpeg")
-    .jpeg({ quality: 90 })
-    .toFile(`uploads/brands/${filename}`);
-  //save image name into DB.
-  req.body.image = filename;
+  if (req.file) {
+    const filename = `brand-${uuidv4()}-${Date.now()}.jpeg`;
+    await sharp(req.file.buffer)
+      .resize(600, 600)
+      .toFormat("jpeg")
+      .jpeg({ quality: 90 })
+      .toFile(`uploads/brands/${filename}`);
+    //save image name into DB.
+    req.body.image = filename;
+  }
   next();
 });
 

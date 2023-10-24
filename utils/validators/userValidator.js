@@ -25,7 +25,15 @@ const createUserValidator = [
     .notEmpty()
     .withMessage("Password required")
     .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters"),
+    .withMessage("Password must be at least 6 characters")
+    .custom((password, { req }) => {
+      if (password !== req.body.passConfirmation)
+        throw new Error("Password Confirmation incorrect");
+      return true;
+    }),
+  check("passConfirmation")
+    .notEmpty()
+    .withMessage("Password confirmation is required"),
   validatorMiddleware,
 ];
 const updateUserValidator = [
@@ -38,6 +46,7 @@ const updateUserValidator = [
     .custom(async (email) => {
       const user = await User.findOne({ email });
       if (user) throw new Error("E-mail already in user");
+      return true;
     }),
   check("phone")
     .optional()

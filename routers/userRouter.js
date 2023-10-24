@@ -1,8 +1,9 @@
 const express = require("express");
-// const {
-//   updateBrandValidator,
-//   brandIdValidator,
-// } = require("../utils/validators/brandValidator");
+const {
+  userIdValidator,
+  createUserValidator,
+  updateUserValidator,
+} = require("../utils/validators/userValidator");
 
 const {
   getUser,
@@ -19,11 +20,17 @@ const userRouter = express.Router();
 
 userRouter
   .route("/")
-  .post(uploadUserImage, resizeImage, createUser)
+  .post(uploadUserImage, resizeImage, createUserValidator, createUser)
   .get(getUsers);
 userRouter
   .route("/:id")
-  .get(setUserIdToBody, getUser)
-  .put(uploadUserImage, resizeImage, setUserIdToBody, updateUser)
-  .delete(setUserIdToBody, deleteUser);
+  .get(setUserIdToBody, userIdValidator, getUser)
+  .put(
+    uploadUserImage,
+    resizeImage,
+    setUserIdToBody,
+    updateUserValidator,
+    updateUser
+  )
+  .delete(setUserIdToBody, userIdValidator, deleteUser);
 module.exports = userRouter;

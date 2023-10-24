@@ -22,15 +22,6 @@ const updateOne = (Model, allowedUpdates) =>
       allowedUpdates.includes(update)
     );
     if (!isValidOperation) return next(new AppError("invalid updates!", 400));
-    //for models that contains a name and it's unique
-    if (name) {
-      const duplicateDocument = await Model.findOne({ name });
-      //check if there is a document with this name is exists.....
-      if (duplicateDocument)
-        return next(
-          new AppError("Duplicate! document with this name exists!", 400)
-        );
-    }
 
     if (title || name) req.body["slug"] = slugify(title || name);
     const document = await Model.findOneAndUpdate({ _id: id }, req.body, {

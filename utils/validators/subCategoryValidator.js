@@ -1,5 +1,7 @@
 const { check } = require("express-validator");
+
 const Category = require("../../models/category");
+const SubCategory = require("../../models/subCategory");
 const validatorMiddleware = require("../../middlewares/validatorMiddleware");
 
 const updateSubCategoryValidator = [
@@ -8,7 +10,13 @@ const updateSubCategoryValidator = [
     .isLength({ min: 2 })
     .withMessage("A subCategory name must have at least 2 characters")
     .isLength({ max: 32 })
-    .withMessage("A subCategory name must have at most 32 characters"),
+    .withMessage("A subCategory name must have at most 32 characters")
+    .custom(async (name) => {
+      //check if there is a document with this name is exists.....
+      const subCategory = await SubCategory.findOne({ name });
+      if (subCategory)
+        throw new Error("Duplicate! subCategory with this name exists!");
+    }),
   check("category")
     .optional()
     .isMongoId()

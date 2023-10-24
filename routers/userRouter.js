@@ -3,6 +3,7 @@ const {
   userIdValidator,
   createUserValidator,
   updateUserValidator,
+  changeUserPasswordValidator,
 } = require("../utils/validators/userValidator");
 
 const {
@@ -18,7 +19,12 @@ const {
 } = require("../controllers/userController");
 
 const userRouter = express.Router();
-userRouter.put("/changePassword/:id", setUserIdToBody, changeUserPassword);
+userRouter.put(
+  "/changePassword/:id",
+  setUserIdToBody,
+  changeUserPasswordValidator,
+  changeUserPassword
+);
 userRouter
   .route("/")
   .post(uploadUserImage, resizeImage, createUserValidator, createUser)

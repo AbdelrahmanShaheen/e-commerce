@@ -62,26 +62,26 @@ const updateUser = factory.updateOne(User, allowedUpdates);
 const changeUserPassword = asyncHandler(async (req, res, next) => {
   const { id } = req.body;
   delete req.body.id;
+  delete req.body.passConfirmation;
+  delete req.body.password;
+
   //handle error when updating by field that does not exist in the document
   const updates = Object.keys(req.body);
   const isValidOperation = updates.every((update) =>
-    ["password"].includes(update)
+    ["newPassword"].includes(update)
   );
   if (!isValidOperation) return next(new AppError("invalid updates!", 400));
 
-  const document = await User.findOneAndUpdate(
+  const user = await User.findOneAndUpdate(
     { _id: id },
     {
-      password: await bcrypt.hash(req.body.password, 12),
+      password: await bcrypt.hash(req.body.newPassword, 12),
     },
     {
       new: true,
     }
   );
-  if (!document)
-    return next(new AppError("Document with this id is not found", 404));
-
-  res.status(200).send({ data: document });
+  res.status(200).send({ data: user });
 });
 //@desc Delete user
 //@route DELETE /api/v1/users/:id

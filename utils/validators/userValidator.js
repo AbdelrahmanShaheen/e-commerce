@@ -1,4 +1,5 @@
 const { check } = require("express-validator");
+const bcrypt = require("bcrypt");
 
 const validatorMiddleware = require("../../middlewares/validatorMiddleware");
 const User = require("../../models/user");
@@ -62,5 +63,32 @@ const userIdValidator = [
   check("id").isMongoId().withMessage("Invalid user id format!"),
   validatorMiddleware,
 ];
-
-module.exports = { userIdValidator, createUserValidator, updateUserValidator };
+const changeUserPasswordValidator = [
+  check("id").isMongoId().withMessage("Invalid user id format!"),
+  check("password")
+    .notEmpty()
+    .withMessage("password is required")
+    .custom(async (password, { req }) => {
+      const user = await User.findOne({ _id: req.body.id });
+      if (!user) throw new Error("user with this id is not found");
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) throw new Error("Password is incorrect");
+      return true;
+    }),
+  check("newPassword").notEmpty().withMessage("New password is required"),
+  check("passConfirmation")
+    .notEmpty()
+    .withMessage("Password confirmation is required")
+    .custom((passConfirmation, { req }) => {
+      if (passConfirmation !== req.body.newPassword)
+        throw new Error("Password confirmation is incorrect");
+      return true;
+    }),
+  validatorMiddleware,
+];
+module.exports = {
+  userIdValidator,
+  createUserValidator,
+  updateUserValidator,
+  changeUserPasswordValidator,
+};

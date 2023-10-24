@@ -1,9 +1,11 @@
 const asyncHandler = require("express-async-handler");
 const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
+const bcrypt = require("bcrypt");
 
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const factory = require("./handlersFactory");
+const AppError = require("../utils/AppError");
 const User = require("../models/user");
 
 const setUserIdToBody = (req, res, next) => {
@@ -52,12 +54,35 @@ const allowedUpdates = [
   "profileImg",
   "email",
   "phone",
-  "password",
   "role",
   "active",
 ];
 const updateUser = factory.updateOne(User, allowedUpdates);
 
+const changeUserPassword = asyncHandler(async (req, res, next) => {
+  const { id } = req.body;
+  delete req.body.id;
+  //handle error when updating by field that does not exist in the document
+  const updates = Object.keys(req.body);
+  const isValidOperation = updates.every((update) =>
+    ["password"].includes(update)
+  );
+  if (!isValidOperation) return next(new AppError("invalid updates!", 400));
+
+  const document = await User.findOneAndUpdate(
+    { _id: id },
+    {
+      password: await bcrypt.hash(req.body.password, 12),
+    },
+    {
+      new: true,
+    }
+  );
+  if (!document)
+    return next(new AppError("Document with this id is not found", 404));
+
+  res.status(200).send({ data: document });
+});
 //@desc Delete user
 //@route DELETE /api/v1/users/:id
 //@access Private
@@ -68,6 +93,7 @@ module.exports = {
   getUsers,
   updateUser,
   deleteUser,
+  changeUserPassword,
   setUserIdToBody,
   uploadUserImage,
   resizeImage,

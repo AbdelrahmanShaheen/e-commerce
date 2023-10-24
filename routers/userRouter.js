@@ -11,13 +11,14 @@ const {
   getUsers,
   updateUser,
   deleteUser,
+  changeUserPassword,
   setUserIdToBody,
   uploadUserImage,
   resizeImage,
 } = require("../controllers/userController");
 
 const userRouter = express.Router();
-
+userRouter.put("/changePassword/:id", setUserIdToBody, changeUserPassword);
 userRouter
   .route("/")
   .post(uploadUserImage, resizeImage, createUserValidator, createUser)

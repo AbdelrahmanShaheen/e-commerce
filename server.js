@@ -14,6 +14,7 @@ const categoryRouter = require("./routers/categoryRouter.js");
 const subCategoryRouter = require("./routers/subCategoryRouter.js");
 const brandRouter = require("./routers/brandRouter.js");
 const productRouter = require("./routers/productRouter.js");
+const userRouter = require("./routers/userRouter.js");
 //.............
 const app = express();
 
@@ -24,10 +25,12 @@ app.use(express.static(path.join(__dirname, "uploads")));
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+// Mount Routes
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/subCategories", subCategoryRouter);
 app.use("/api/v1/brands", brandRouter);
 app.use("/api/v1/products", productRouter);
+app.use("/api/v1/users", userRouter);
 //Catching Unhandled Routes
 app.all("*", (req, res, next) => {
   next(new AppError(`cannot find ${req.originalUrl} on the server`, 404));

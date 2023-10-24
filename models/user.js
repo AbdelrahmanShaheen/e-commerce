@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
       required: [true, "name is required"],
+      minlength: [3, "Too short name"],
     },
     slug: {
       type: String,

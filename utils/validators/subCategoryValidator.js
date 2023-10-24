@@ -16,6 +16,7 @@ const updateSubCategoryValidator = [
       const subCategory = await SubCategory.findOne({ name });
       if (subCategory)
         throw new Error("Duplicate! subCategory with this name exists!");
+      return true;
     }),
   check("category")
     .optional()
@@ -24,6 +25,7 @@ const updateSubCategoryValidator = [
     .custom(async (categoryId) => {
       const category = await Category.findById(categoryId);
       if (!category) throw new Error(`No category for this id: ${categoryId}`);
+      return true;
     }),
   check("id")
     .isMongoId()
@@ -38,6 +40,7 @@ const categoryIdValidator = [
     .custom(async (categoryId) => {
       const category = await Category.findById(categoryId);
       if (!category) throw new Error("Category with this id is not found");
+      return true;
     }),
   validatorMiddleware,
 ];

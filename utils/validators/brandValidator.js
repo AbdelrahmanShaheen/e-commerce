@@ -13,6 +13,7 @@ const updateBrandValidator = [
       //check if there is a document with this name is exists.....
       const brand = await Brand.findOne({ name });
       if (brand) throw new Error("Duplicate! brand with this name exists!");
+      return true;
     }),
   check("id")
     .isMongoId()

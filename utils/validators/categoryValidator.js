@@ -14,6 +14,7 @@ const updateCategoryValidator = [
       const category = await Category.findOne({ name });
       if (category)
         throw new Error("Duplicate! category with this name exists!");
+      return true;
     }),
   check("id")
     .isMongoId()

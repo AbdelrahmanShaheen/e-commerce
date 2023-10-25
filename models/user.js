@@ -41,14 +41,14 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// const token = await user.generateAuthToken();
-userSchema.methods.generateAuthToken = async function () {
+userSchema.methods.generateAuthToken = function () {
   const user = this;
   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE_TIME,
   });
   return token;
 };
+
 userSchema.pre("save", async function (next) {
   const user = this;
   if (!user.isModified("password")) return next();

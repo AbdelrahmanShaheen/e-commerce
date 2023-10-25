@@ -33,22 +33,22 @@ const resizeImage = asyncHandler(async (req, res, next) => {
 
 //@desc Get a specific user
 //@route GET /api/v1/users/:id
-//@access Private
+//@access Private/Admin
 const getUser = factory.getOne(User);
 
 //@desc Create user
 //@route POST /api/v1/users
-//@access Private
+//@access Private/Admin
 const createUser = factory.createOne(User);
 
 //@desc Get list of users
 //@route GET /api/v1/users
-//@access Private
+//@access Private/[Admin-Manager]
 const getUsers = factory.getAll(User);
 
 //@desc Update user
 //@route PUT /api/v1/users/:id
-//@access Private
+//@access Private/Admin
 const allowedUpdates = [
   "name",
   "profileImg",
@@ -59,6 +59,9 @@ const allowedUpdates = [
 ];
 const updateUser = factory.updateOne(User, allowedUpdates);
 
+//@desc Update user password
+//@route PUT /api/v1/users/changePassword/:id
+//@access Public
 const changeUserPassword = asyncHandler(async (req, res, next) => {
   const { id } = req.body;
   delete req.body.id;
@@ -86,7 +89,7 @@ const changeUserPassword = asyncHandler(async (req, res, next) => {
 });
 //@desc Delete user
 //@route DELETE /api/v1/users/:id
-//@access Private
+//@access Private/Admin
 const deleteUser = factory.deleteOne(User);
 module.exports = {
   getUser,

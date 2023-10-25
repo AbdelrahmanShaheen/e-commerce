@@ -35,7 +35,7 @@ const getCategory = factory.getOne(Category);
 
 //@desc Create category
 //@route POST /api/v1/categories
-//@access Private
+//@access Private/[Admin-Manager]
 const createCategory = factory.createOne(Category);
 
 //@desc Get list of categories
@@ -45,13 +45,13 @@ const getCategories = factory.getAll(Category);
 
 //@desc Update category
 //@route PUT /api/v1/categories/:id
-//@access Private
+//@access Private/[Admin-Manager]
 const allowedUpdates = ["name", "image"];
 const updateCategory = factory.updateOne(Category, allowedUpdates);
 
 //@desc Delete category
 //@route POST /api/v1/categories/:id
-//@access Private
+//@access Private/Admin
 const deleteCategory = factory.deleteOne(Category);
 module.exports = {
   getCategory,

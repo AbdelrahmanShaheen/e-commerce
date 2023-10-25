@@ -26,7 +26,7 @@ const setFilterObjToBody = (req, res, next) => {
 };
 //@desc Create subCategory
 //@route POST /api/v1/subCategories
-//@access Private
+//@access Private/[Admin-Manager]
 const createSubCategory = factory.createOne(SubCategory);
 
 //@desc Get list of subCategories
@@ -41,13 +41,13 @@ const getSubCategory = factory.getOne(SubCategory);
 
 //@desc Update category
 //@route PUT /api/v1/categories/:id
-//@access Private
+//@access Private/[Admin-Manager]
 const allowedUpdates = ["name", "category"];
 const updateSubCategory = factory.updateOne(SubCategory, allowedUpdates);
 
 //@desc Delete category
 //@route POST /api/v1/categories/:id
-//@access Private
+//@access Private/Admin
 const deleteSubCategory = factory.deleteOne(SubCategory);
 
 module.exports = {

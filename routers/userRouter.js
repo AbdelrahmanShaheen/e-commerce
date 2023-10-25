@@ -18,6 +18,9 @@ const {
   resizeImage,
 } = require("../controllers/userController");
 
+const auth = require("../middlewares/authMiddleware");
+const allowedTo = require("../middlewares/allowedToMiddleware");
+
 const userRouter = express.Router();
 userRouter.put(
   "/changePassword/:id",
@@ -27,17 +30,32 @@ userRouter.put(
 );
 userRouter
   .route("/")
-  .post(uploadUserImage, resizeImage, createUserValidator, createUser)
-  .get(getUsers);
+  .post(
+    auth,
+    allowedTo("admin"),
+    uploadUserImage,
+    resizeImage,
+    createUserValidator,
+    createUser
+  )
+  .get(auth, allowedTo("admin", "manager"), getUsers);
 userRouter
   .route("/:id")
-  .get(setUserIdToBody, userIdValidator, getUser)
+  .get(auth, allowedTo("admin"), setUserIdToBody, userIdValidator, getUser)
   .put(
+    auth,
+    allowedTo("admin"),
     uploadUserImage,
     resizeImage,
     setUserIdToBody,
     updateUserValidator,
     updateUser
   )
-  .delete(setUserIdToBody, userIdValidator, deleteUser);
+  .delete(
+    auth,
+    allowedTo("admin"),
+    setUserIdToBody,
+    userIdValidator,
+    deleteUser
+  );
 module.exports = userRouter;

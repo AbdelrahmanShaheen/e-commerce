@@ -15,15 +15,36 @@ const {
   setSubCategoryIdToBody,
 } = require("../controllers/subCategoryController");
 
+const auth = require("../middlewares/authMiddleware");
+const allowedTo = require("../middlewares/allowedToMiddleware");
+
 const app = express();
 const subCategoryRouter = express.Router({ mergeParams: true });
 subCategoryRouter
   .route("/")
-  .post(setCategoryIdToBody, categoryIdValidator, createSubCategory)
+  .post(
+    auth,
+    allowedTo("admin", "manager"),
+    setCategoryIdToBody,
+    categoryIdValidator,
+    createSubCategory
+  )
   .get(setFilterObjToBody, categoryIdValidator, getSubCategories);
 subCategoryRouter
   .route("/:id")
   .get(setSubCategoryIdToBody, subCategoryIdValidator, getSubCategory)
-  .put(setSubCategoryIdToBody, updateSubCategoryValidator, updateSubCategory)
-  .delete(setSubCategoryIdToBody, subCategoryIdValidator, deleteSubCategory);
+  .put(
+    auth,
+    allowedTo("admin", "manager"),
+    setSubCategoryIdToBody,
+    updateSubCategoryValidator,
+    updateSubCategory
+  )
+  .delete(
+    auth,
+    allowedTo("admin"),
+    setSubCategoryIdToBody,
+    subCategoryIdValidator,
+    deleteSubCategory
+  );
 module.exports = subCategoryRouter;

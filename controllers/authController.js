@@ -97,7 +97,7 @@ const verifyPassResetCode = asyncHandler(async (req, res, next) => {
     passwordResetExpires: { $gt: Date.now() },
   });
   if (!user) {
-    return next(new AppError("Reset code invalid or expired"));
+    return next(new AppError("Reset code invalid or expired", 400));
   }
 
   // 2) Reset code valid
@@ -108,4 +108,39 @@ const verifyPassResetCode = asyncHandler(async (req, res, next) => {
     status: "Success",
   });
 });
-module.exports = { signup, login, forgotPassword, verifyPassResetCode };
+
+// @desc    Reset password
+// @route   POST /api/v1/auth/resetPassword
+// @access  Public
+const resetPassword = asyncHandler(async (req, res, next) => {
+  // 1) Get user based on email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(
+      new AppError(`There is no user with email ${req.body.email}`, 404)
+    );
+  }
+
+  // 2) Check if reset code verified
+  if (!user.passwordResetVerified) {
+    return next(new AppError("Reset code not verified", 400));
+  }
+
+  user.password = req.body.newPassword;
+  user.passwordResetCode = undefined;
+  user.passwordResetExpires = undefined;
+  user.passwordResetVerified = undefined;
+
+  await user.save();
+
+  // 3) if everything is ok, generate token
+  const token = user.generateAuthToken();
+  res.status(200).json({ token });
+});
+module.exports = {
+  signup,
+  login,
+  forgotPassword,
+  verifyPassResetCode,
+  resetPassword,
+};

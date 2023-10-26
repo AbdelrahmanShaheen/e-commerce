@@ -55,7 +55,7 @@ const getProduct = factory.getOne(Product);
 
 //@desc Create product
 //@route POST /api/v1/products
-//@access Private
+//@access Private/[Admin-Manager]
 const createProduct = factory.createOne(Product);
 
 //@desc Get list of products
@@ -65,7 +65,7 @@ const getProducts = factory.getAll(Product, "Product");
 
 //@desc Update product
 //@route PUT /api/v1/products/:id
-//@access Private
+//@access Private/[Admin-Manager]
 const allowedUpdates = [
   "title",
   "description",
@@ -86,7 +86,7 @@ const updateProduct = factory.updateOne(Product, allowedUpdates);
 
 //@desc Delete product
 //@route POST /api/v1/products/:id
-//@access Private
+//@access Private/Admin
 const deleteProduct = factory.deleteOne(Product);
 
 module.exports = {

@@ -9,6 +9,12 @@ const handleDuplicateFieldsDB = (error) => {
 const handleValidationErrorDB = (error) => {
   return new AppError(`${error.message}`, 400);
 };
+const handleJwtExpired = () => {
+  return new AppError("Expired token, please login again..", 401);
+};
+const handleJwtInvalidSignature = () => {
+  return new AppError("Invalid token, please login again..", 401);
+};
 const sendErrorDev = (err, res) => {
   return res.status(err.statusCode).send({
     message: err.message,
@@ -43,6 +49,8 @@ const globalErrorHandler = (err, req, res, next) => {
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
     if (error?.errors?.name?.name === "ValidatorError")
       error = handleValidationErrorDB(error.errors.name);
+    if (error.name === "TokenExpiredError") error = handleJwtExpired();
+    if (error.name === "JsonWebTokenError") error = handleJwtInvalidSignature();
     sendErrorProd(error, res);
   }
 };

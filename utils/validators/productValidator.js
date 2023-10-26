@@ -97,6 +97,7 @@ const updateProductValidator = [
     .custom(async (categoryId) => {
       const category = await Category.findById(categoryId);
       if (!category) throw new Error(`No category for this id: ${categoryId}`);
+      return true;
     }),
   check("subcategories")
     .optional()
@@ -186,6 +187,7 @@ const createProductValidator = [
     .custom(async (categoryId) => {
       const category = await Category.findById(categoryId);
       if (!category) throw new Error(`No category for this id: ${categoryId}`);
+      return true;
     }),
   check("subcategories")
     .optional()

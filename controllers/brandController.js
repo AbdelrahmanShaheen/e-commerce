@@ -35,7 +35,7 @@ const getBrand = factory.getOne(Brand);
 
 //@desc Create brand
 //@route POST /api/v1/brands
-//@access Private
+//@access Private/[Admin-Manager]
 const createBrand = factory.createOne(Brand);
 
 //@desc Get list of brands
@@ -45,13 +45,13 @@ const getBrands = factory.getAll(Brand);
 
 //@desc Update brand
 //@route PUT /api/v1/brands/:id
-//@access Private
+//@access Private/[Admin-Manager]
 const allowedUpdates = ["name", "image"];
 const updateBrand = factory.updateOne(Brand, allowedUpdates);
 
 //@desc Delete brand
 //@route POST /api/v1/brands/:id
-//@access Private
+//@access Private/Admin
 const deleteBrand = factory.deleteOne(Brand);
 module.exports = {
   getBrand,

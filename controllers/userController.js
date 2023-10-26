@@ -96,7 +96,7 @@ const deleteUser = factory.deleteOne(User);
 
 // @desc    Get Logged user data
 // @route   GET /api/v1/users/getMe
-// @access  Private/Protect
+// @access  Private/Auth
 const getLoggedUserData = asyncHandler(async (req, res, next) => {
   req.body.id = req.user._id;
   next();
@@ -104,7 +104,7 @@ const getLoggedUserData = asyncHandler(async (req, res, next) => {
 
 // @desc    Update logged user password
 // @route   PUT /api/v1/users/changeMyPassword
-// @access  Private/Protect
+// @access  Private/Auth
 const changeLoggedUserPassword = asyncHandler(async (req, res, next) => {
   const { user } = req;
   user.password = req.body.password;
@@ -115,7 +115,7 @@ const changeLoggedUserPassword = asyncHandler(async (req, res, next) => {
 
 // @desc    Update logged user data (without password, role)
 // @route   PUT /api/v1/users/updateMe
-// @access  Private/Protect
+// @access  Private/Auth
 const updateLoggedUserData = asyncHandler(async (req, res, next) => {
   const allowedUpdates = ["name", "email", "phone"];
   //handle error when updating by field that does not exist in the user
@@ -136,6 +136,17 @@ const updateLoggedUserData = asyncHandler(async (req, res, next) => {
 
   res.status(200).send({ data: updatedUser });
 });
+
+// @desc    Deactivate logged user
+// @route   DELETE /api/v1/users/deleteMe
+// @access  Private/Auth
+const deleteLoggedUserData = asyncHandler(async (req, res, next) => {
+  const { user } = req;
+  user.active = false;
+  await user.save();
+  res.status(204).send({ status: "success" });
+});
+
 module.exports = {
   getUser,
   createUser,
@@ -149,4 +160,5 @@ module.exports = {
   getLoggedUserData,
   changeLoggedUserPassword,
   updateLoggedUserData,
+  deleteLoggedUserData,
 };

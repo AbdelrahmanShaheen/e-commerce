@@ -20,6 +20,7 @@ const {
   getLoggedUserData,
   changeLoggedUserPassword,
   updateLoggedUserData,
+  deleteLoggedUserData,
 } = require("../controllers/userController");
 
 const auth = require("../middlewares/authMiddleware");
@@ -31,6 +32,7 @@ userRouter.use(auth);
 userRouter.get("/getMe", getLoggedUserData, getUser);
 userRouter.put("/changeMyPassword", changeLoggedUserPassword);
 userRouter.put("/UpdateMe", updateLoggedUserValidator, updateLoggedUserData);
+userRouter.delete("/deleteMe", deleteLoggedUserData);
 //Admin
 userRouter.put(
   "/changePassword/:id",

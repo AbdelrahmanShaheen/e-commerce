@@ -40,6 +40,10 @@ const auth = asyncHandler(async (req, res, next) => {
       );
     }
   }
+  // check if the user active or not
+  if (!user.active) {
+    return next(new AppError("User is not active", 401));
+  }
   req.user = user;
   next();
 });

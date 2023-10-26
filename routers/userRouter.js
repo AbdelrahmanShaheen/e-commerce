@@ -17,6 +17,7 @@ const {
   uploadUserImage,
   resizeImage,
   getLoggedUserData,
+  changeLoggedUserPassword,
 } = require("../controllers/userController");
 
 const auth = require("../middlewares/authMiddleware");
@@ -24,6 +25,7 @@ const allowedTo = require("../middlewares/allowedToMiddleware");
 
 const userRouter = express.Router();
 userRouter.route("/getMe").get(auth, getLoggedUserData, getUser);
+userRouter.route("/changeMyPassword").put(auth, changeLoggedUserPassword);
 userRouter.put(
   "/changePassword/:id",
   setUserIdToBody,

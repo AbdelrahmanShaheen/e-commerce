@@ -100,6 +100,17 @@ const getLoggedUserData = asyncHandler(async (req, res, next) => {
   req.body.id = req.user._id;
   next();
 });
+
+// @desc    Update logged user password
+// @route   PUT /api/v1/users/changeMyPassword
+// @access  Private/Protect
+const changeLoggedUserPassword = asyncHandler(async (req, res, next) => {
+  const { user } = req;
+  user.password = req.body.password;
+  user.passwordChangedAt = Date.now();
+  await user.save();
+  res.status(200).send({ data: user, token: user.generateAuthToken() });
+});
 module.exports = {
   getUser,
   createUser,
@@ -111,4 +122,5 @@ module.exports = {
   uploadUserImage,
   resizeImage,
   getLoggedUserData,
+  changeLoggedUserPassword,
 };

@@ -86,9 +86,27 @@ const changeUserPasswordValidator = [
     }),
   validatorMiddleware,
 ];
+const updateLoggedUserValidator = [
+  check("name").optional().isLength({ min: 3 }).withMessage("Too short name"),
+  check("email")
+    .optional()
+    .isEmail()
+    .withMessage("Invalid email address")
+    .custom(async (email) => {
+      const user = await User.findOne({ email });
+      if (user) throw new Error("E-mail already in user");
+      return true;
+    }),
+  check("phone")
+    .optional()
+    .isMobilePhone(["ar-EG", "ar-SA"])
+    .withMessage("Invalid phone number only accepted Egy and SA Phone numbers"),
+  validatorMiddleware,
+];
 module.exports = {
   userIdValidator,
   createUserValidator,
   updateUserValidator,
   changeUserPasswordValidator,
+  updateLoggedUserValidator,
 };

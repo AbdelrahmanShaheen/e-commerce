@@ -4,6 +4,7 @@ const {
   createUserValidator,
   updateUserValidator,
   changeUserPasswordValidator,
+  updateLoggedUserValidator,
 } = require("../utils/validators/userValidator");
 
 const {
@@ -18,14 +19,20 @@ const {
   resizeImage,
   getLoggedUserData,
   changeLoggedUserPassword,
+  updateLoggedUserData,
 } = require("../controllers/userController");
 
 const auth = require("../middlewares/authMiddleware");
 const allowedTo = require("../middlewares/allowedToMiddleware");
 
 const userRouter = express.Router();
+//Logged user
 userRouter.route("/getMe").get(auth, getLoggedUserData, getUser);
 userRouter.route("/changeMyPassword").put(auth, changeLoggedUserPassword);
+userRouter
+  .route("/UpdateMe")
+  .put(auth, updateLoggedUserValidator, updateLoggedUserData);
+//Admin
 userRouter.put(
   "/changePassword/:id",
   setUserIdToBody,

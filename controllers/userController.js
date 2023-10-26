@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
+const slugify = require("slugify");
 
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const factory = require("./handlersFactory");
@@ -111,6 +112,30 @@ const changeLoggedUserPassword = asyncHandler(async (req, res, next) => {
   await user.save();
   res.status(200).send({ data: user, token: user.generateAuthToken() });
 });
+
+// @desc    Update logged user data (without password, role)
+// @route   PUT /api/v1/users/updateMe
+// @access  Private/Protect
+const updateLoggedUserData = asyncHandler(async (req, res, next) => {
+  const allowedUpdates = ["name", "email", "phone"];
+  //handle error when updating by field that does not exist in the user
+  const updates = Object.keys(req.body);
+  const isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+  if (!isValidOperation) return next(new AppError("invalid updates!", 400));
+
+  req.body["slug"] = slugify(req.body.name);
+  const updatedUser = await User.findOneAndUpdate(
+    { _id: req.user._id },
+    req.body,
+    {
+      new: true,
+    }
+  );
+
+  res.status(200).send({ data: updatedUser });
+});
 module.exports = {
   getUser,
   createUser,
@@ -123,4 +148,5 @@ module.exports = {
   resizeImage,
   getLoggedUserData,
   changeLoggedUserPassword,
+  updateLoggedUserData,
 };

@@ -26,15 +26,15 @@ const auth = require("../middlewares/authMiddleware");
 const allowedTo = require("../middlewares/allowedToMiddleware");
 
 const userRouter = express.Router();
+userRouter.use(auth);
 //Logged user
-userRouter.route("/getMe").get(auth, getLoggedUserData, getUser);
-userRouter.route("/changeMyPassword").put(auth, changeLoggedUserPassword);
-userRouter
-  .route("/UpdateMe")
-  .put(auth, updateLoggedUserValidator, updateLoggedUserData);
+userRouter.get("/getMe", getLoggedUserData, getUser);
+userRouter.put("/changeMyPassword", changeLoggedUserPassword);
+userRouter.put("/UpdateMe", updateLoggedUserValidator, updateLoggedUserData);
 //Admin
 userRouter.put(
   "/changePassword/:id",
+  allowedTo("admin"),
   setUserIdToBody,
   changeUserPasswordValidator,
   changeUserPassword
@@ -42,19 +42,17 @@ userRouter.put(
 userRouter
   .route("/")
   .post(
-    auth,
     allowedTo("admin"),
     uploadUserImage,
     resizeImage,
     createUserValidator,
     createUser
   )
-  .get(auth, allowedTo("admin", "manager"), getUsers);
+  .get(allowedTo("admin", "manager"), getUsers);
 userRouter
   .route("/:id")
-  .get(auth, allowedTo("admin"), setUserIdToBody, userIdValidator, getUser)
+  .get(allowedTo("admin"), setUserIdToBody, userIdValidator, getUser)
   .put(
-    auth,
     allowedTo("admin"),
     uploadUserImage,
     resizeImage,
@@ -62,11 +60,5 @@ userRouter
     updateUserValidator,
     updateUser
   )
-  .delete(
-    auth,
-    allowedTo("admin"),
-    setUserIdToBody,
-    userIdValidator,
-    deleteUser
-  );
+  .delete(allowedTo("admin"), setUserIdToBody, userIdValidator, deleteUser);
 module.exports = userRouter;

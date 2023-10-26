@@ -62,7 +62,7 @@ const updateUser = factory.updateOne(User, allowedUpdates);
 
 //@desc Update user password
 //@route PUT /api/v1/users/changePassword/:id
-//@access Public
+//@access Private/Admin
 const changeUserPassword = asyncHandler(async (req, res, next) => {
   const { id } = req.body;
   delete req.body.id;

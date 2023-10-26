@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
-
+//@desc Authorization(User Permission)
 const allowedTo = (...roles) =>
   asyncHandler(async (req, res, next) => {
     const { user } = req;

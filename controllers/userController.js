@@ -87,10 +87,19 @@ const changeUserPassword = asyncHandler(async (req, res, next) => {
   );
   res.status(200).send({ data: user });
 });
+
 //@desc Delete user
 //@route DELETE /api/v1/users/:id
 //@access Private/Admin
 const deleteUser = factory.deleteOne(User);
+
+// @desc    Get Logged user data
+// @route   GET /api/v1/users/getMe
+// @access  Private/Protect
+const getLoggedUserData = asyncHandler(async (req, res, next) => {
+  req.body.id = req.user._id;
+  next();
+});
 module.exports = {
   getUser,
   createUser,
@@ -101,4 +110,5 @@ module.exports = {
   setUserIdToBody,
   uploadUserImage,
   resizeImage,
+  getLoggedUserData,
 };

@@ -16,12 +16,14 @@ const {
   setUserIdToBody,
   uploadUserImage,
   resizeImage,
+  getLoggedUserData,
 } = require("../controllers/userController");
 
 const auth = require("../middlewares/authMiddleware");
 const allowedTo = require("../middlewares/allowedToMiddleware");
 
 const userRouter = express.Router();
+userRouter.route("/getMe").get(auth, getLoggedUserData, getUser);
 userRouter.put(
   "/changePassword/:id",
   setUserIdToBody,

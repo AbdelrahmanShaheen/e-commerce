@@ -33,6 +33,9 @@ const login = asyncHandler(async (req, res, next) => {
   res.status(200).send({ data: user, token });
 });
 
+// @desc    Forgot password
+// @route   POST /api/v1/auth/forgotPassword
+// @access  Public
 const forgotPassword = asyncHandler(async (req, res, next) => {
   //1) Get user by email
   const { email } = req.body;
@@ -78,4 +81,31 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
     .status(200)
     .json({ status: "Success", message: "Reset code sent to email" });
 });
-module.exports = { signup, login, forgotPassword };
+
+// @desc    Verify password reset code
+// @route   POST /api/v1/auth/verifyResetCode
+// @access  Public
+const verifyPassResetCode = asyncHandler(async (req, res, next) => {
+  // 1) Get user based on reset code
+  const hashedResetCode = crypto
+    .createHash("sha256")
+    .update(req.body.resetCode)
+    .digest("hex");
+
+  const user = await User.findOne({
+    passwordResetCode: hashedResetCode,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  if (!user) {
+    return next(new AppError("Reset code invalid or expired"));
+  }
+
+  // 2) Reset code valid
+  user.passwordResetVerified = true;
+  await user.save();
+
+  res.status(200).json({
+    status: "Success",
+  });
+});
+module.exports = { signup, login, forgotPassword, verifyPassResetCode };

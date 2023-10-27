@@ -12,7 +12,7 @@ const setBrandIdToBody = (req, res, next) => {
 };
 
 // Upload single image
-const uploadCategoryImage = uploadSingleImage("image");
+const uploadBrandImage = uploadSingleImage("image");
 
 const resizeImage = asyncHandler(async (req, res, next) => {
   if (req.file) {
@@ -60,6 +60,6 @@ module.exports = {
   updateBrand,
   deleteBrand,
   setBrandIdToBody,
-  uploadCategoryImage,
+  uploadBrandImage,
   resizeImage,
 };

@@ -11,7 +11,7 @@ const {
   updateBrand,
   deleteBrand,
   setBrandIdToBody,
-  uploadCategoryImage,
+  uploadBrandImage,
   resizeImage,
 } = require("../controllers/brandController");
 
@@ -24,7 +24,7 @@ brandRouter
   .post(
     auth,
     allowedTo("admin", "manager"),
-    uploadCategoryImage,
+    uploadBrandImage,
     resizeImage,
     createBrand
   )
@@ -35,7 +35,7 @@ brandRouter
   .put(
     auth,
     allowedTo("admin", "manager"),
-    uploadCategoryImage,
+    uploadBrandImage,
     resizeImage,
     setBrandIdToBody,
     updateBrandValidator,

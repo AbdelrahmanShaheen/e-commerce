@@ -19,7 +19,7 @@ const BrandSchema = new mongoose.Schema(
 );
 const setImgUrl = (doc) => {
   if (doc.image) {
-    const imgUrl = process.env.BASE_URL + "/categories/" + doc.image;
+    const imgUrl = process.env.BASE_URL + "/brands/" + doc.image;
     doc.image = imgUrl;
   }
 };

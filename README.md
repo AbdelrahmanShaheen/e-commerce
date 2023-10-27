@@ -203,7 +203,7 @@ To run this project, you will need to add the following environment variables to
 
 ###### This is a detailed documentation for all api endpoints that have been implemented
 
-[Click!]()
+[Click!](https://github.com/AbdelrahmanShaheen/e-commerce/blob/main/api-docs.md)
 
 ## ToDo
 

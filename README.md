@@ -34,6 +34,9 @@ Real World Backend RESTful API For E-Commerce Platform Ready for Mobile or Web E
 - Advanced Searching, Sorting, Pagination, and Filtering
 - Users can recover forgotten passwords
 - Ensure proper validation and error handling is implemented for the API endpoints.
+- Sending emails via gmail using `nodemailer` (sending reset password code).
+- Well-organized and well-documented code (Clean code).
+- Used MVC Architecture
 
 ## More about uploading images :
 

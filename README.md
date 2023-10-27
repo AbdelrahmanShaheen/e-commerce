@@ -16,7 +16,8 @@
     - [Environment Variables](#environment-variables)
   - [Api Docs](#api-docs) - [This is a detailed documentation for all api endpoints that have been implemented](#this-is-a-detailed-documentation-for-all-api-endpoints-that-have-been-implemented)
   - [ToDo](#todo) - [Here are some features that i 'll implement soon:](#here-are-some-features-that-i-ll-implement-soon)
-  </details>
+
+</details>
 
 ## Description
 
@@ -184,18 +185,18 @@ the backend server will be running on the specified port on your env files.
 
 To run this project, you will need to add the following environment variables to your .env file \
 \
-`PORT`
-`NODE_ENV` [`development` OR `production`]
+`PORT`\
+`NODE_ENV` [`development` OR `production`]\
 `BASE_URL` like `http://localhost:8000`
 
-`DB_PASS`
-`DB_USER_NAME`
+`DB_PASS`\
+`DB_USER_NAME`\
 `DB_URI`
 
-`JWT_SECRET`
+`JWT_SECRET`\
 `JWT_EXPIRE_TIME`
 
-`EMAIL_PASSWORD`
+`EMAIL_PASSWORD`\
 `EMAIL_USER`
 
 ## Api Docs

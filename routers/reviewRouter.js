@@ -1,5 +1,10 @@
 const express = require("express");
-
+const {
+  createReviewValidator,
+  updateReviewValidator,
+  reviewIdValidator,
+  deleteReviewValidator,
+} = require("../utils/validators/reviewValidator");
 const {
   getReview,
   createReview,
@@ -15,16 +20,23 @@ const reviewRouter = express.Router();
 
 reviewRouter
   .route("/")
-  .post(auth, allowedTo("user"), createReview)
+  .post(auth, allowedTo("user"), createReviewValidator, createReview)
   .get(getReviews);
 reviewRouter
   .route("/:id")
-  .get(setReviewIdToBody, getReview)
-  .put(auth, allowedTo("user"), setReviewIdToBody, updateReview)
+  .get(setReviewIdToBody, reviewIdValidator, getReview)
+  .put(
+    auth,
+    allowedTo("user"),
+    setReviewIdToBody,
+    updateReviewValidator,
+    updateReview
+  )
   .delete(
     auth,
     allowedTo("admin", "manager", "user"),
     setReviewIdToBody,
+    deleteReviewValidator,
     deleteReview
   );
 module.exports = reviewRouter;

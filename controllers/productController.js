@@ -51,7 +51,12 @@ const resizeImage = asyncHandler(async (req, res, next) => {
 //@desc Get a specific product
 //@route GET /api/v1/products/:id
 //@access Public
-const getProduct = factory.getOne(Product);
+const populateOptions = {
+  path: "reviews",
+  select: "ratings title -_id -product",
+  options: { _recursed: true },
+};
+const getProduct = factory.getOne(Product, populateOptions);
 
 //@desc Create product
 //@route POST /api/v1/products

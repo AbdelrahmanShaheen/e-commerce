@@ -68,7 +68,11 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 const setImgUrl = (doc) => {
   if (doc.images) {
@@ -84,7 +88,11 @@ const setImgUrl = (doc) => {
     doc.imageCover = imgUrl;
   }
 };
-
+productSchema.virtual("reviews", {
+  ref: "Review",
+  localField: "_id",
+  foreignField: "product",
+});
 //After create/save query
 productSchema.post("save", function (doc) {
   setImgUrl(doc);
@@ -101,5 +109,6 @@ productSchema.pre(["find", "findOne"], function (next) {
   });
   next();
 });
+
 const Product = mongoose.model("Product", productSchema);
 module.exports = Product;

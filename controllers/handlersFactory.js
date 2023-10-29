@@ -42,10 +42,18 @@ const createOne = (Model) =>
     res.status(201).send({ data: document });
   });
 
-const getOne = (Model) =>
+const getOne = (Model, populateOptions = {}) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.body;
-    const document = await Model.findOne({ _id: id });
+    //build the query
+    let query = Model.findOne({ _id: id });
+    //put this in utils
+    const isEmptyObj = Object.keys(populateOptions).length ? false : true;
+    if (!isEmptyObj) {
+      query = query.populate(populateOptions);
+    }
+    //exec the query
+    const document = await query;
     if (!document)
       return next(new AppError("document with this id is not found", 404));
     res.status(200).send({ data: document });

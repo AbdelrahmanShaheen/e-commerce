@@ -70,7 +70,7 @@ const deleteReviewValidator = [
       const review = await Review.findOne({ _id: id });
       if (!review) throw new Error(`There is no review with this id: ${id}`);
       if (req.user.role === "user") {
-        if (String(review.user) !== String(req.user._id))
+        if (String(review.user._id) !== String(req.user._id))
           throw new Error("You are not allowed to perform this action");
       }
       return true;

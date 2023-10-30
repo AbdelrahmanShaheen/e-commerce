@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
 const slugify = require("slugify");
 const ApiFeatures = require("../utils/apiFeatures");
+const Review = require("../models/review");
 
 const deleteOne = (Model) =>
   asyncHandler(async (req, res, next) => {
@@ -9,6 +10,9 @@ const deleteOne = (Model) =>
     const document = await Model.findByIdAndRemove(id);
     if (!document)
       return next(new AppError("document with this id is not found", 404));
+    if (Model.modelName === "Review") {
+      await Review.calcAvgRatingsAndQuantity(document.product);
+    }
     res.status(204).send();
   });
 
@@ -29,7 +33,7 @@ const updateOne = (Model, allowedUpdates) =>
     });
     if (!document)
       return next(new AppError("Document with this id is not found", 404));
-
+    await document.save();
     res.status(200).send({ data: document });
   });
 
@@ -42,10 +46,18 @@ const createOne = (Model) =>
     res.status(201).send({ data: document });
   });
 
-const getOne = (Model) =>
+const getOne = (Model, populateOptions = {}) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.body;
-    const document = await Model.findOne({ _id: id });
+    //build the query
+    let query = Model.findOne({ _id: id });
+    //put this in utils
+    const isEmptyObj = Object.keys(populateOptions).length ? false : true;
+    if (!isEmptyObj) {
+      query = query.populate(populateOptions);
+    }
+    //exec the query
+    const document = await query;
     if (!document)
       return next(new AppError("document with this id is not found", 404));
     res.status(200).send({ data: document });

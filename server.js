@@ -16,6 +16,7 @@ const brandRouter = require("./routers/brandRouter.js");
 const productRouter = require("./routers/productRouter.js");
 const userRouter = require("./routers/userRouter.js");
 const authRouter = require("./routers/authRouter.js");
+const reviewRouter = require("./routers/reviewRouter.js");
 //.............
 const app = express();
 
@@ -32,6 +33,7 @@ app.use("/api/v1/subCategories", subCategoryRouter);
 app.use("/api/v1/brands", brandRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/auth", authRouter);
 //Catching Unhandled Routes
 app.all("*", (req, res, next) => {

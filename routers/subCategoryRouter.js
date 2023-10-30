@@ -18,7 +18,6 @@ const {
 const auth = require("../middlewares/authMiddleware");
 const allowedTo = require("../middlewares/allowedToMiddleware");
 
-const app = express();
 const subCategoryRouter = express.Router({ mergeParams: true });
 subCategoryRouter
   .route("/")

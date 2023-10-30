@@ -23,9 +23,7 @@ const updateReviewValidator = [
 ];
 
 const reviewIdValidator = [
-  check("id")
-    .isMongoId()
-    .withMessage("Review with that invalid id does not exist!"),
+  check("id").isMongoId().withMessage("Invalid review id format"),
   validatorMiddleware,
 ];
 const createReviewValidator = [
@@ -40,9 +38,11 @@ const createReviewValidator = [
     .withMessage("Review must belong to user")
     .isMongoId()
     .withMessage("Invalid ID formate")
-    .custom(async (userId) => {
+    .custom(async (userId, { req }) => {
       const user = await User.findOne({ _id: userId });
       if (!user) throw new Error(`No user for this id: ${userId}`);
+      if (String(user._id) !== String(req.user._id))
+        throw new Error("You are not allowed to perform this action");
       return true;
     }),
   check("product")
@@ -77,9 +77,22 @@ const deleteReviewValidator = [
     }),
   validatorMiddleware,
 ];
+const productIdValidator = [
+  check("product")
+    .optional()
+    .isMongoId()
+    .withMessage("Invalid product id!")
+    .custom(async (productId) => {
+      const product = await Product.findById(productId);
+      if (!product) throw new Error("Product with this id is not found");
+      return true;
+    }),
+  validatorMiddleware,
+];
 module.exports = {
   createReviewValidator,
   updateReviewValidator,
   reviewIdValidator,
   deleteReviewValidator,
+  productIdValidator,
 };

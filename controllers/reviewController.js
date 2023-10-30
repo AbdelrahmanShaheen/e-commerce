@@ -6,6 +6,24 @@ const setReviewIdToBody = (req, res, next) => {
   delete req.params.id;
   next();
 };
+//used for nested route (getOne)
+const setProductIdToBody = (req, res, next) => {
+  req.body.product = req.params.productId;
+  delete req.params.productId;
+  next();
+};
+//used for nested route (getAll)
+const setFilterObjToBody = (req, res, next) => {
+  const { productId } = req.params;
+  let filterObj = {};
+  if (productId) {
+    req.body.product = productId;
+    filterObj = { product: productId };
+  }
+  req.body.filterObj = filterObj;
+  delete req.params.productId;
+  next();
+};
 
 //@desc Get a specific review
 //@route GET /api/v1/reviews/:id
@@ -39,4 +57,6 @@ module.exports = {
   updateReview,
   deleteReview,
   setReviewIdToBody,
+  setProductIdToBody,
+  setFilterObjToBody,
 };

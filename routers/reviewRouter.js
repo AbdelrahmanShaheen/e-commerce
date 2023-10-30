@@ -4,6 +4,7 @@ const {
   updateReviewValidator,
   reviewIdValidator,
   deleteReviewValidator,
+  productIdValidator,
 } = require("../utils/validators/reviewValidator");
 const {
   getReview,
@@ -12,19 +13,27 @@ const {
   updateReview,
   deleteReview,
   setReviewIdToBody,
+  setProductIdToBody,
+  setFilterObjToBody,
 } = require("../controllers/reviewController");
 
 const auth = require("../middlewares/authMiddleware");
 const allowedTo = require("../middlewares/allowedToMiddleware");
-const reviewRouter = express.Router();
+const reviewRouter = express.Router({ mergeParams: true });
 
 reviewRouter
   .route("/")
   .post(auth, allowedTo("user"), createReviewValidator, createReview)
-  .get(getReviews);
+  .get(setFilterObjToBody, productIdValidator, getReviews);
 reviewRouter
   .route("/:id")
-  .get(setReviewIdToBody, reviewIdValidator, getReview)
+  .get(
+    setProductIdToBody,
+    productIdValidator,
+    setReviewIdToBody,
+    reviewIdValidator,
+    getReview
+  )
   .put(
     auth,
     allowedTo("user"),

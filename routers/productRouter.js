@@ -19,8 +19,10 @@ const {
 
 const auth = require("../middlewares/authMiddleware");
 const allowedTo = require("../middlewares/allowedToMiddleware");
-
+const reviewRouter = require("../routers/reviewRouter");
 const productRouter = express.Router();
+//for nested routes :
+productRouter.use("/:productId/reviews", reviewRouter);
 
 productRouter
   .route("/")

@@ -12,19 +12,12 @@ const auth = require("../middlewares/authMiddleware");
 const allowedTo = require("../middlewares/allowedToMiddleware");
 
 const wishlistRouter = express.Router();
-// wishlistRouter.use(auth);
-//Logged user
+wishlistRouter.use(auth, allowedTo("user"));
 wishlistRouter
   .route("/")
-  .post(auth, allowedTo("user"), productIdValidator, addProductToWishlist)
-  .get(auth, allowedTo("user"), getLoggedUserWishlist);
+  .post(productIdValidator, addProductToWishlist)
+  .get(getLoggedUserWishlist);
 wishlistRouter
   .route("/:productId")
-  .delete(
-    auth,
-    allowedTo("user"),
-    setProductIdToBody,
-    productIdValidator,
-    removeProductFromWishlist
-  );
+  .delete(setProductIdToBody, productIdValidator, removeProductFromWishlist);
 module.exports = wishlistRouter;

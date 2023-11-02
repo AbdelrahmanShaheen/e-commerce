@@ -7,7 +7,9 @@ const addressIdValidator = [
     .withMessage("Invalid address id format!")
     .custom(async (addressId, { req }) => {
       const { user } = req;
-      const check = user.addresses.some((address) => address._id === addressId);
+      const check = user.addresses.some(
+        (address) => String(address._id) === addressId
+      );
       if (!check) {
         throw new Error(`There is no address with this id: ${addressId}`);
       }

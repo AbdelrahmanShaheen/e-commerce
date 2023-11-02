@@ -2,13 +2,16 @@
 <summary>Table of content</summary>
 
 - [API Endpoints](#api-endpoints)
-  - [for category](#for-category)
-  - [for subCategories](#for-subcategories)
-  - [for brand](#for-brand)
-  - [for product](#for-product)
-  - [for user](#for-user)
-  - [for logged users](#for-logged-users)
-  - [for Authentication](#for-authentication)
+    - [for category](#for-category)
+    - [for subCategories](#for-subcategories)
+    - [for brand](#for-brand)
+    - [for product](#for-product)
+    - [for user](#for-user)
+    - [for logged users](#for-logged-users)
+    - [for Authentication](#for-authentication)
+    - [for review](#for-review)
+    - [for wishlist](#for-wishlist)
+    - [for address](#for-address)
 - [API Documentation](#api-documentation)
   - [Category Resource](#category-resource)
   - [SubCategory Resource](#subcategory-resource)
@@ -16,7 +19,11 @@
   - [Product Resource](#product-resource)
   - [User Resource](#user-resource)
   - [Auth Resource](#auth-resource)
-  </details>
+  - [Review Resource](#review-resource)
+  - [Wishlist Resource](#wishlist-resource)
+  - [Address Resource](#address-resource)
+
+</details>
 
 ## API Endpoints
 
@@ -90,6 +97,32 @@
 | `POST`  | `/api/auth/forgotPassword`  | `Public` | `Forgot password`            |
 | `POST`  | `/api/auth/verifyResetCode` | `Public` | `Verify password reset code` |
 | `PUT`   | `/api/auth/resetPassword`   | `Public` | `Reset password`             |
+
+#### for review
+
+| Methods  | Endpoints                        | Access                        | Description                                         |
+| :------- | :------------------------------- | :---------------------------- | :-------------------------------------------------- |
+| `POST`   | `/api/v1/reviews`                | `Private[User]`               | `Create Review on a product`                        |
+| `GET`    | `/api/v1/:productId/reviews`     | `public`                      | `Get list of reviews belongs to specific product`   |
+| `GET`    | `/api/v1/:productId/reviews/:id` | `Public`                      | `Get a specific review belongs to specific product` |
+| `PUT`    | `/api/v1/reviews/:id`            | `private[User]`               | `Update review on a product`                        |
+| `DELETE` | `/api/v1/reviews/:id`            | `Private[User-Admin-Manager]` | `Delete review on a product`                        |
+
+#### for wishlist
+
+| Methods  | Endpoints                      | Access          | Description                    |
+| :------- | :----------------------------- | :-------------- | :----------------------------- |
+| `POST`   | `/api/v1/wishlists`            | `Private[User]` | `Add product to wishlist`      |
+| `GET`    | `/api/v1/wishlists`            | `Private[User]` | `get logged user wishlist`     |
+| `DELETE` | `/api/v1/wishlists/:productId` | `Private[User]` | `remove product from wishlist` |
+
+#### for address
+
+| Methods  | Endpoints                      | Access          | Description                               |
+| :------- | :----------------------------- | :-------------- | :---------------------------------------- |
+| `POST`   | `/api/v1/addresses`            | `Private[User]` | `Add address to user addresses list`      |
+| `GET`    | `/api/v1/addresses`            | `Private[User]` | `get logged user addresses`               |
+| `DELETE` | `/api/v1/addresses/:addressId` | `Private[User]` | `remove address from user addresses list` |
 
 ## API Documentation
 
@@ -1751,5 +1784,468 @@ Note: when you send the body to the server convert it to JSON format.
 ```
 
 2- If you enter invalid data in the body or in the header ,a descriptive error message will be sent.
+
+</details>
+
+### Review Resource
+
+<details>
+<summary>
+Create review
+</summary>
+
+```http
+  POST /api/v1/reviews
+```
+
+Note: when you send the body to the server convert it to JSON format.
+| Body | Type | Description | Constraint |
+| :--------- | :------- | :--------------------------------- |:--------- |
+| `title` | `String` | review title/comment | **Not Required** |
+| `ratings` | `Number` | rating of a user | **Required** & **min:1.0** & **max:5.0**|
+| `user` | `ObjectId` | The ID of the user making a review| **Required**|
+| `product` | `ObjectId` | The ID of the product being reviewed| **Required**|
+
+| Headers           | Type           | Description                            |
+| :---------------- | :------------- | :------------------------------------- |
+| `"Authorization"` | `Bearer Token` | **Required**.Bearer token of auth user |
+
+- Responses :
+
+1- status code `201` with these data
+
+```json
+{
+  "data": {
+    "title": "Gold is gold",
+    "ratings": 5,
+    "product": "6534654b104831c9487a8f1a",
+    "user": "65424aba6fa3cf8375b1cef1",
+    "_id": "654356548c7bd0f6697568b5",
+    "createdAt": "2023-11-02T07:57:08.995Z",
+    "updatedAt": "2023-11-02T07:57:08.995Z",
+    "__v": 0
+  }
+}
+```
+
+2- If you enter invalid data in the body or in the header ,a descriptive error message will be sent.
+
+</details>
+
+<details>
+<summary>
+Get list of reviews belongs to specific product
+</summary>
+
+```http
+  GET /api/v1/products/:productId/reviews
+```
+
+| Query                       | Endpoint                                                         | Description                                                                        |
+| :-------------------------- | :--------------------------------------------------------------- | :--------------------------------------------------------------------------------- |
+| ``                          | `/api/v1/products/:productId/reviews`                            | get all reviews with default 50 reviews in each page                               |
+| `limit & page (pagination)` | `/api/v1/products/:productId/reviews?limit=3&page=2`             | get the second page ,each page with 3 reviews                                      |
+| `fields`                    | `/api/v1/products/:productId/reviews?fields=name,-_id,createdAt` | limit fields in the response (put '-' before a field to exclude it)                |
+| `keyword`                   | `/api/v1/products/:productId/reviews?keyword=bad`                | search for reviews that their title contains 'bad' keyword                         |
+| `sortBy`                    | `/api/v1/products/:productId/reviews?sortBy=-createdAt`          | sort the response by createdAt field in desc order (for asc remove '-' or add '+') |
+
+- note: you can make your combination of these queryString
+
+- Responses :
+
+1- status code `200` with these data
+
+```json
+{
+  "results": 2,
+  "paginationResult": {
+    "currentPage": 1,
+    "limit": 50,
+    "numberOfPages": 1
+  },
+  "data": [
+    {
+      "_id": "653f467bcad6dcd364752194",
+      "title": "perfect gold",
+      "ratings": 5,
+      "product": "6534654b104831c9487a8f1a",
+      "user": {
+        "_id": "653cf47aeb518115443713cf",
+        "name": "nira"
+      },
+      "createdAt": "2023-10-30T06:00:27.570Z",
+      "updatedAt": "2023-10-30T06:00:27.570Z"
+    },
+    {
+      "_id": "654356548c7bd0f6697568b5",
+      "title": "Gold is gold",
+      "ratings": 5,
+      "product": "6534654b104831c9487a8f1a",
+      "user": {
+        "_id": "65424aba6fa3cf8375b1cef1",
+        "name": "salma"
+      },
+      "createdAt": "2023-11-02T07:57:08.995Z",
+      "updatedAt": "2023-11-02T07:57:08.995Z"
+    }
+  ]
+}
+```
+
+2- If you enter invalid data in the body or in the header ,a descriptive error message will be sent.
+
+</details>
+
+<details>
+<summary>
+Get a specific review belongs to specific product
+</summary>
+
+```http
+  GET /api/v1/products/:productId/reviews/:id
+```
+
+| Params      | Description              |
+| :---------- | :----------------------- |
+| `id`        | id of a specific review  |
+| `productId` | id of a specific product |
+
+- Responses :
+
+1- status code `200` with these data
+
+```json
+{
+  "data": {
+    "_id": "653e043e39a163b50e82d91e",
+    "title": "no comment",
+    "ratings": 3,
+    "product": "6536e390c543c9b63c297ee3",
+    "user": {
+      "_id": "653cf47aeb518115443713cf",
+      "name": "nira"
+    },
+    "createdAt": "2023-10-29T07:05:34.314Z",
+    "updatedAt": "2023-10-29T08:25:26.397Z",
+    "__v": 0
+  }
+}
+```
+
+2- If you enter invalid data in the body or in the header ,a descriptive error message will be sent.
+
+</details>
+
+<details>
+<summary>
+Update a review
+</summary>
+
+```http
+  PUT /api/v1/reviews/:id
+```
+
+Note: when you send the body to the server convert it to JSON format.
+| Body | Type | Description | Constraint |
+| :--------- | :------- | :--------------------------------- |:--------- |
+| `title` | `String` | review title/comment | **Optional** |
+| `ratings` | `Number` | rating of a user | **Optional** & **min:1.0** & **max:5.0**|
+
+| Params | Description             |
+| :----- | :---------------------- |
+| `id`   | id of a specific review |
+
+choose the fields you want to update
+
+| Headers           | Type           | Description                            |
+| :---------------- | :------------- | :------------------------------------- |
+| `"Authorization"` | `Bearer Token` | **Required**.Bearer token of auth user |
+
+- Responses :
+
+1- status code `200` with these data
+
+```json
+{
+  "data": {
+    "_id": "652edb520d26581bede3fb1f",
+    "name": "IKEA",
+    "slug": "ikea",
+    "createdAt": "2023-10-17T19:06:58.822Z",
+    "updatedAt": "2023-10-21T20:34:48.127Z",
+    "__v": 0
+  }
+}
+```
+
+2- If you enter invalid data in the body or in the header ,a descriptive error message will be sent.
+
+</details>
+
+<details>
+<summary>
+Delete a review
+</summary>
+
+```http
+  DELETE /api/v1/reviews/:id
+```
+
+| Params | Endpoint              | Description             |
+| :----- | :-------------------- | :---------------------- |
+| `id`   | `/api/v1/reviews/:id` | id of a specific review |
+
+| Headers           | Type           | Description                            |
+| :---------------- | :------------- | :------------------------------------- |
+| `"Authorization"` | `Bearer Token` | **Required**.Bearer token of auth user |
+
+- Responses :
+
+1- status code `204` with no json data
+
+2- If you enter invalid id in the body or in the header ,a descriptive error message will be sent.
+
+</details>
+
+### Wishlist Resource
+
+<details>
+<summary>
+Add product to my wishlist
+</summary>
+
+```http
+  POST /api/v1/wishlists
+```
+
+Note: when you send the body to the server convert it to JSON format.
+| Body | Type | Description | Constraint |
+| :--------- | :------- | :--------------------------------- |:--------- |
+| `product` | `ObjectId` | The ID of the product| **Required**|
+
+| Headers           | Type           | Description                            |
+| :---------------- | :------------- | :------------------------------------- |
+| `"Authorization"` | `Bearer Token` | **Required**.Bearer token of auth user |
+
+- Responses :
+
+1- status code `201` with these data
+
+```json
+{
+  "message": "Product added successfully to your wishlist.",
+  "data": ["6534654b104831c9487a8f1a"]
+}
+```
+
+2- If you enter invalid data in the body or in the header ,a descriptive error message will be sent.
+
+</details>
+
+<details>
+<summary>
+Get logged user wishlists
+</summary>
+
+```http
+  GET /api/v1/wishlists
+```
+
+| Headers           | Type           | Description                            |
+| :---------------- | :------------- | :------------------------------------- |
+| `"Authorization"` | `Bearer Token` | **Required**.Bearer token of auth user |
+
+- Responses :
+
+1- status code `200` with these data
+
+```json
+{
+  "status": "success",
+  "results": 1,
+  "data": [
+    {
+      "_id": "6534654b104831c9487a8f1a",
+      "title": "Solid Gold Petite Micropave",
+      "price": 168,
+      "category": {
+        "name": "electronics"
+      },
+      "ratingsAverage": 5,
+      "id": "6534654b104831c9487a8f1a"
+    }
+  ]
+}
+```
+
+2- If you enter invalid data in the body or in the header ,a descriptive error message will be sent.
+
+</details>
+
+<details>
+<summary>
+Remove a product from wishlist
+</summary>
+
+```http
+  DELETE /api/v1/wishlists/:id
+```
+
+| Params | Description              |
+| :----- | :----------------------- |
+| `id`   | id of a specific product |
+
+| Headers           | Type           | Description                            |
+| :---------------- | :------------- | :------------------------------------- |
+| `"Authorization"` | `Bearer Token` | **Required**.Bearer token of auth user |
+
+- Responses :
+
+1- status code `200` with these data
+
+```json
+{
+  "message": "Product removed successfully from your wishlist.",
+  "data": []
+}
+```
+
+2- If you enter invalid id in the body or in the header ,a descriptive error message will be sent.
+
+</details>
+
+### Address Resource
+
+<details>
+<summary>
+Add address to my addresses list
+</summary>
+
+```http
+  POST /api/v1/addresses
+```
+
+Note: when you send the body to the server convert it to JSON format.
+| Body | Type | Description | Constraint |
+| :--------- | :------- | :--------------------------------- |:--------- |
+| `alias` | `String` | alias of an address| **Not Required**|
+| `details` | `String` | address details| **Not Required**|
+| `phone` | `String` | phone of the address/place| **Not Required**|
+| `city` | `String` | the city where the address belongs to| **Not Required**|
+| `postalCode` | `String` | postalCode :) | **Not Required**|
+
+| Headers           | Type           | Description                            |
+| :---------------- | :------------- | :------------------------------------- |
+| `"Authorization"` | `Bearer Token` | **Required**.Bearer token of auth user |
+
+- Responses :
+
+1- status code `201` with these data
+
+```json
+{
+  "message": "Address added successfully.",
+  "data": [
+    {
+      "alias": "work",
+      "details": "work details",
+      "phone": "01091831532",
+      "city": "menouf",
+      "postalCode": "225631",
+      "_id": "65436af72f5ad03f44283c0d"
+    }
+  ]
+}
+```
+
+2- If you enter invalid data in the body or in the header ,a descriptive error message will be sent.
+
+</details>
+
+<details>
+<summary>
+Get logged user addresses
+</summary>
+
+```http
+  GET /api/v1/addresses
+```
+
+| Headers           | Type           | Description                            |
+| :---------------- | :------------- | :------------------------------------- |
+| `"Authorization"` | `Bearer Token` | **Required**.Bearer token of auth user |
+
+- Responses :
+
+1- status code `200` with these data
+
+```json
+{
+  "status": "success",
+  "results": 2,
+  "data": [
+    {
+      "alias": "work",
+      "details": "work details",
+      "phone": "01091831532",
+      "city": "menouf",
+      "postalCode": "225631",
+      "_id": "65436af72f5ad03f44283c0d"
+    },
+    {
+      "alias": "home",
+      "details": "home details",
+      "phone": "01091831532",
+      "city": "cairo",
+      "postalCode": "123546",
+      "_id": "65436b382f5ad03f44283c12"
+    }
+  ]
+}
+```
+
+2- If you enter invalid data in the body or in the header ,a descriptive error message will be sent.
+
+</details>
+
+<details>
+<summary>
+Remove a address from user addresses
+</summary>
+
+```http
+  DELETE /api/v1/addresses/:id
+```
+
+| Params | Description              |
+| :----- | :----------------------- |
+| `id`   | id of a specific address |
+
+| Headers           | Type           | Description                            |
+| :---------------- | :------------- | :------------------------------------- |
+| `"Authorization"` | `Bearer Token` | **Required**.Bearer token of auth user |
+
+- Responses :
+
+1- status code `200` with these data
+
+```json
+{
+  "message": "Address removed successfully.",
+  "data": [
+    {
+      "alias": "work",
+      "details": "work details",
+      "phone": "01091831532",
+      "city": "menouf",
+      "postalCode": "225631",
+      "_id": "65436af72f5ad03f44283c0d"
+    }
+  ]
+}
+```
+
+2- If you enter invalid id in the body or in the header ,a descriptive error message will be sent.
 
 </details>

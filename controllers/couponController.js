@@ -1,6 +1,10 @@
 const factory = require("./handlersFactory");
 const Coupon = require("../models/coupon");
-
+const setCouponIdToBody = (req, res, next) => {
+  req.body.id = req.params.id;
+  delete req.params.id;
+  next();
+};
 //@desc Get a specific coupon
 //@route GET /api/v1/coupons/:id
 //@access Private/[Admin-Manager]
@@ -32,4 +36,5 @@ module.exports = {
   getCoupons,
   updateCoupon,
   deleteCoupon,
+  setCouponIdToBody,
 };

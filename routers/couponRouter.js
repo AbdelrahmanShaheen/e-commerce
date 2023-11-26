@@ -6,6 +6,7 @@ const {
   getCoupons,
   updateCoupon,
   deleteCoupon,
+  setCouponIdToBody,
 } = require("../controllers/couponController");
 
 const auth = require("../middlewares/authMiddleware");
@@ -15,7 +16,7 @@ couponRouter.use(auth, allowedTo("admin", "manager"));
 couponRouter.route("/").post(createCoupon).get(getCoupons);
 couponRouter
   .route("/:id")
-  .get(getCoupon)
-  .put(updateCoupon)
-  .delete(deleteCoupon);
+  .get(setCouponIdToBody, getCoupon)
+  .put(setCouponIdToBody, updateCoupon)
+  .delete(setCouponIdToBody, deleteCoupon);
 module.exports = couponRouter;

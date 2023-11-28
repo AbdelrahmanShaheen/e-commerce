@@ -50,16 +50,20 @@ const addProductToCart = asyncHandler(async (req, res, next) => {
 //@access Private/user
 
 const getLoggedUserCart = asyncHandler(async (req, res, next) => {
-
+  let cart = await Cart.findOne({ user: req.user });
+  if (!cart) return next(new AppError("There is no cart for this user", 404));
+  res.status(200).send({
+    status: "success",
+    data: cart,
+    numOfCartItems: cart.cartItems.length,
+  });
 });
 
 //@desc Remove specific cart item
 //@route DELETE /api/v1/cart/:id
 //@access Private/user
 
-const removeSpecificCartItem = asyncHandler(async (req, res, next) => {
-  
-});
+const removeSpecificCartItem = asyncHandler(async (req, res, next) => {});
 
 //@desc Clear logged user cart
 //@route DELETE /api/v1/cart/:id
@@ -72,8 +76,6 @@ const clearCart = asyncHandler(async (req, res, next) => {});
 //@access Private/user
 
 const updateCartItemQuantity = asyncHandler(async (req, res, next) => {});
-
-
 
 module.exports = {
   addProductToCart,

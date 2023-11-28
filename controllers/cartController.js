@@ -86,7 +86,11 @@ const removeSpecificCartItem = asyncHandler(async (req, res, next) => {
 //@route DELETE /api/v1/cart/:id
 //@access Private/user
 
-const clearCart = asyncHandler(async (req, res, next) => {});
+const clearCart = asyncHandler(async (req, res, next) => {
+  const id = req.user._id;
+  await Cart.findOneAndDelete({ user: id });
+  res.status(204).send();
+});
 
 //@desc update specific cart item quantity
 //@route PUT /api/v1/cart/:id

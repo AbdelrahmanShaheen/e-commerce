@@ -96,7 +96,28 @@ const clearCart = asyncHandler(async (req, res, next) => {
 //@route PUT /api/v1/cart/:id
 //@access Private/user
 
-const updateCartItemQuantity = asyncHandler(async (req, res, next) => {});
+const updateCartItemQuantity = asyncHandler(async (req, res, next) => {
+  const id = req.params.id;
+  const { quantity } = req.body;
+  const cart = await Cart.findOne({ user: req.user._id });
+  if (!cart) return next(new AppError("There is no cart for this user", 404));
+  let cartItemExist = false;
+  cart.cartItems.forEach((item) => {
+    if (item._id.toString() === id) {
+      item.quantity = quantity;
+      cartItemExist = true;
+    }
+  });
+  if (!cartItemExist)
+    return next(new AppError(`There is no item for this id:  ${id}`, 404));
+  calcTotalCartPrice(cart);
+  await cart.save();
+  res.status(200).send({
+    status: "success",
+    data: cart,
+    numOfCartItems: cart.cartItems.length,
+  });
+});
 
 module.exports = {
   addProductToCart,

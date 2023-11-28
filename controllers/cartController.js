@@ -63,7 +63,24 @@ const getLoggedUserCart = asyncHandler(async (req, res, next) => {
 //@route DELETE /api/v1/cart/:id
 //@access Private/user
 
-const removeSpecificCartItem = asyncHandler(async (req, res, next) => {});
+const removeSpecificCartItem = asyncHandler(async (req, res, next) => {
+  const { _id } = req.user;
+  let cart = await Cart.findOneAndUpdate(
+    { user: _id },
+    {
+      $pull: { cartItems: { _id: req.params.id } },
+    },
+    { new: true }
+  );
+  if (!cart) return next(new AppError("There is no cart for this user", 404));
+  calcTotalCartPrice(cart);
+  await cart.save();
+  res.status(200).send({
+    status: "success",
+    data: cart,
+    numOfCartItems: cart.cartItems.length,
+  });
+});
 
 //@desc Clear logged user cart
 //@route DELETE /api/v1/cart/:id

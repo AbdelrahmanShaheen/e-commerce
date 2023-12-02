@@ -68,10 +68,40 @@ const findAllOrders = factory.getAll(Order);
 //@route POST /api/v1/orders/orderId
 //@access Public/[user-admin-manager]
 const findOrder = factory.getOne(Order);
+
+//@desc update order to paid
+//@route PUT /api/v1/orders/:orderId/pay
+//@access Private/[admin-manager]
+const updateOrderToPaid = asyncHandler(async (req, res, next) => {
+  const { orderId } = req.params;
+  const order = await Order.findById(orderId);
+  if (!order)
+    next(new AppError(`There is no order with this id: ${orderId}`, 404));
+  order.isPaid = true;
+  order.paidAt = Date.now();
+  await order.save();
+  res.status(200).send({ message: "success", data: order });
+});
+
+//@desc update order to delivered
+//@route PUT /api/v1/orders/:orderId/deliver
+//@access Private/[admin-manager]
+const updateOrderToDelivered = asyncHandler(async (req, res, next) => {
+  const { orderId } = req.params;
+  const order = await Order.findById(orderId);
+  if (!order)
+    next(new AppError(`There is no order with this id: ${orderId}`, 404));
+  order.isDelivered = true;
+  order.deliveredAt = Date.now();
+  await order.save();
+  res.status(200).send({ message: "success", data: order });
+});
 module.exports = {
   createCashOrder,
   findAllOrders,
   findOrder,
+  updateOrderToPaid,
+  updateOrderToDelivered,
   setOrderIdToBody,
   filterOrderForLoggedUser,
 };

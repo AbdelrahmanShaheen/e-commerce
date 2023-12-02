@@ -4,6 +4,8 @@ const {
   createCashOrder,
   findAllOrders,
   findOrder,
+  updateOrderToPaid,
+  updateOrderToDelivered,
   setOrderIdToBody,
   filterOrderForLoggedUser,
 } = require("../controllers/orderController");
@@ -22,4 +24,14 @@ orderRouter
     findAllOrders
   );
 orderRouter.get("/:orderId", setOrderIdToBody, findOrder);
+orderRouter.put(
+  "/:orderId/pay",
+  allowedTo("admin", "manager"),
+  updateOrderToPaid
+);
+orderRouter.put(
+  "/:orderId/deliver",
+  allowedTo("admin", "manager"),
+  updateOrderToDelivered
+);
 module.exports = orderRouter;

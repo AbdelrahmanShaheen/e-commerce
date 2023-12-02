@@ -1,10 +1,22 @@
 const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
+const factory = require("./handlersFactory");
 
 const Order = require("../models/order");
 const Cart = require("../models/cart");
 const Product = require("../models/product");
 
+const setOrderIdToBody = (req, res, next) => {
+  req.body.id = req.params.orderId;
+  delete req.params.orderId;
+  next();
+};
+const filterOrderForLoggedUser = (req, res, next) => {
+  if (req.user.role === "user") {
+    req.body.filterObj = { user: req.user._id };
+  }
+  next();
+};
 //@desc create cash order
 //@route POST /api/v1/orders/cartId
 //@access Private/user
@@ -47,4 +59,19 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
   res.status(201).send({ message: "success", data: order });
 });
 
-module.exports = { createCashOrder };
+//@desc find all orders
+//@route POST /api/v1/orders
+//@access Private/[admin-manager]
+const findAllOrders = factory.getAll(Order);
+
+//@desc find specific order
+//@route POST /api/v1/orders/orderId
+//@access Public/[user-admin-manager]
+const findOrder = factory.getOne(Order);
+module.exports = {
+  createCashOrder,
+  findAllOrders,
+  findOrder,
+  setOrderIdToBody,
+  filterOrderForLoggedUser,
+};

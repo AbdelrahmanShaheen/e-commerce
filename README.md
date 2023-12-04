@@ -14,10 +14,8 @@
   - [Installation 📥](#installation-)
   - [How to use](#how-to-use)
     - [Environment Variables](#environment-variables)
-  - [Api Docs](#api-docs)
-          - [This is a detailed documentation for all api endpoints that have been implemented](#this-is-a-detailed-documentation-for-all-api-endpoints-that-have-been-implemented)
-  - [ToDo](#todo)
-          - [Here are some features that i 'll implement soon:](#here-are-some-features-that-i-ll-implement-soon)
+  - [Api Docs](#api-docs) - [This is a detailed documentation for all api endpoints that have been implemented](#this-is-a-detailed-documentation-for-all-api-endpoints-that-have-been-implemented)
+  - [ToDo](#todo) - [Here are some features that i 'll implement soon:](#here-are-some-features-that-i-ll-implement-soon)
 
 </details>
 
@@ -40,6 +38,10 @@ Real World Backend RESTful API For E-Commerce Platform Ready for Mobile or Web E
 - Reviews Feature: Users can create/update/delete/read reviews by title and rating (1-5). Each user can make one review per product and update their own reviews. Anyone can retrieve reviews. Admins and managers have the authority to delete reviews. Product data includes all reviews, and the system calculates ratingsAverage and ratingsQuantity when CRUDing a review.
 - Wishlist Feature: Users can add/remove products to/from their wishlists and view their wishlist products.
 - User Addresses Feature: Users can add, remove, and view a list of addresses with `aliases`, `details`, `phone` `numbers`, and `cities`.
+- Shopping cart feature so user can add product items in a cart to buy.
+- Coupon feature so user can apply a coupon to get a discount .
+- Order feature
+- Cash on delivery (no online payment required)
 - Well-organized and well-documented code (Clean code).
 - Used MVC Architecture
 
@@ -219,6 +221,10 @@ To run this project, you will need to add the following environment variables to
 
 - [x] Reviews, Wishlist And User Addresses features
 
-- [ ] Coupons And Shopping Cart features
+- [x] Coupons And Shopping Cart features
 
-- [ ] Cash And Online Orders, Online Payments And Deployments
+- [x] Cash payment And Online Orders
+- [ ] Credit card payment with `paymob`
+- [ ] add validation layer for coupons ,cart and orders
+- [ ] Redis for cashing
+- [ ] AWS S3 for file uploading instead of using multer and server file system

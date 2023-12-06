@@ -3,6 +3,7 @@ const asyncHandler = require("express-async-handler");
 const AppError = require("../utils/AppError");
 const factory = require("./handlersFactory");
 
+const User = require("../models/user");
 const Order = require("../models/order");
 const Cart = require("../models/cart");
 const Product = require("../models/product");

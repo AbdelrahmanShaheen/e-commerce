@@ -2,6 +2,7 @@ const express = require("express");
 
 const {
   createCashOrder,
+  checkoutSession,
   findAllOrders,
   findOrder,
   updateOrderToPaid,
@@ -14,6 +15,12 @@ const auth = require("../middlewares/authMiddleware");
 const allowedTo = require("../middlewares/allowedToMiddleware");
 const orderRouter = express.Router();
 orderRouter.use(auth);
+
+orderRouter.get(
+  "/checkout-session/:cartId",
+  allowedTo("user"),
+  checkoutSession
+);
 
 orderRouter.route("/:cartId").post(allowedTo("user"), createCashOrder);
 orderRouter

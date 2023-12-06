@@ -11,7 +11,7 @@ const compression = require("compression");
 
 const AppError = require("./utils/AppError.js");
 const globalErrorHandler = require("./middlewares/errorMiddleware.js");
-
+const { webhookCheckout } = require("./controllers/orderController.js");
 const mountRoutes = require("./routers");
 const app = express();
 //Middlewares
@@ -24,10 +24,17 @@ app.use(express.static(path.join(__dirname, "uploads")));
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
 mountRoutes(app);
 app.all("*", (req, res, next) => {
   next(new AppError(`cannot find ${req.originalUrl} on the server`, 404));
 });
+// Checkout webhook
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  webhookCheckout
+);
 //Use Global Error Handling Middleware inside express
 app.use(globalErrorHandler);
 //........................

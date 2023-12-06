@@ -9,13 +9,16 @@
   - [More about uploading images :](#more-about-uploading-images-)
   - [More about Authentication \& Authorization :](#more-about-authentication--authorization-)
   - [More about Validation \& Error handling :](#more-about-validation--error-handling-)
+  - [More about the payment feature :](#more-about-the-payment-feature-)
   - [Project structure](#project-structure)
   - [Database Schema](#database-schema)
   - [Installation 📥](#installation-)
   - [How to use](#how-to-use)
     - [Environment Variables](#environment-variables)
-  - [Api Docs](#api-docs) - [This is a detailed documentation for all api endpoints that have been implemented](#this-is-a-detailed-documentation-for-all-api-endpoints-that-have-been-implemented)
-  - [ToDo](#todo) - [Here are some features that i 'll implement soon:](#here-are-some-features-that-i-ll-implement-soon)
+  - [Api Docs](#api-docs)
+          - [This is a detailed documentation for all api endpoints that have been implemented](#this-is-a-detailed-documentation-for-all-api-endpoints-that-have-been-implemented)
+  - [ToDo](#todo)
+          - [Here are some features that i 'll implement soon:](#here-are-some-features-that-i-ll-implement-soon)
 
 </details>
 
@@ -42,6 +45,7 @@ Real World Backend RESTful API For E-Commerce Platform Ready for Mobile or Web E
 - Coupon feature so user can apply a coupon to get a discount .
 - Order feature
 - Cash on delivery (no online payment required)
+- Credit card payment with `stripe`
 - Well-organized and well-documented code (Clean code).
 - Used MVC Architecture
 
@@ -76,6 +80,8 @@ Real World Backend RESTful API For E-Commerce Platform Ready for Mobile or Web E
 - used validation layer before entering the handler to handle all inputs in `req.body`. Made it using `express-validator` lib.
 - used global error handler middleware to handle all operational and non-operational errors coming from controllers/handlers.
 - there is no error that does not been handled in the system.
+
+## More about the payment feature :
 
 ## Project structure
 
@@ -209,6 +215,9 @@ To run this project, you will need to add the following environment variables to
 `EMAIL_PASSWORD`\
 `EMAIL_USER`
 
+`STRIPE_SECRET`\
+`STRIPE_WEBHOOK_SECRET`
+
 ## Api Docs
 
 ###### This is a detailed documentation for all api endpoints that have been implemented
@@ -224,7 +233,7 @@ To run this project, you will need to add the following environment variables to
 - [x] Coupons And Shopping Cart features
 
 - [x] Cash payment And Online Orders
-- [ ] Credit card payment with `paymob`
+- [x] Credit card payment with `stripe`
 - [ ] add validation layer for coupons ,cart and orders
 - [ ] Redis for cashing
 - [ ] AWS S3 for file uploading instead of using multer and server file system

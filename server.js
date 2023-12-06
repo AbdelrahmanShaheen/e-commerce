@@ -18,23 +18,21 @@ const app = express();
 app.use(cors());
 app.use(compression());
 app.options("*", cors());
-
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "uploads")));
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
-
-mountRoutes(app);
-app.all("*", (req, res, next) => {
-  next(new AppError(`cannot find ${req.originalUrl} on the server`, 404));
-});
 // Checkout webhook
 app.post(
   "/webhook-checkout",
   express.raw({ type: "application/json" }),
   webhookCheckout
 );
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "uploads")));
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+mountRoutes(app);
+app.all("*", (req, res, next) => {
+  next(new AppError(`cannot find ${req.originalUrl} on the server`, 404));
+});
 //Use Global Error Handling Middleware inside express
 app.use(globalErrorHandler);
 //........................

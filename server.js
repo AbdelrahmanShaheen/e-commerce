@@ -9,6 +9,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const compression = require("compression");
+const hpp = require("hpp");
 
 const AppError = require("./utils/AppError.js");
 const globalErrorHandler = require("./middlewares/errorMiddleware.js");
@@ -41,6 +42,19 @@ const limiter = rateLimit({
 
 // Apply the rate limiting middleware to login route.
 app.use("/api/v1/auth/login", limiter);
+
+// Protect against HTTP Parameter Pollution attacks
+app.use(
+  hpp({
+    whitelist: [
+      "price",
+      "ratingsAverage",
+      "sold",
+      "quantity",
+      "ratingsQuantity",
+    ],
+  })
+);
 
 mountRoutes(app);
 app.all("*", (req, res, next) => {

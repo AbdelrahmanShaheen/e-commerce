@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 require("./db/mongoose.js");
 
+const rateLimit = require("express-rate-limit");
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
@@ -24,11 +25,23 @@ app.post(
   express.raw({ type: "application/json" }),
   webhookCheckout
 );
+// Set request size limit to 20kb
 app.use(express.json({ limit: "20kb" }));
+
 app.use(express.static(path.join(__dirname, "uploads")));
+
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 5, //   Limit each IP to 5 requests per `window` (here, per 15 minutes).
+});
+
+// Apply the rate limiting middleware to login route.
+app.use("/api/v1/auth/login", limiter);
+
 mountRoutes(app);
 app.all("*", (req, res, next) => {
   next(new AppError(`cannot find ${req.originalUrl} on the server`, 404));

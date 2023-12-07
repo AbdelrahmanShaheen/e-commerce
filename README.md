@@ -9,7 +9,7 @@
   - [More about uploading images :](#more-about-uploading-images-)
   - [More about Authentication \& Authorization :](#more-about-authentication--authorization-)
   - [More about Validation \& Error handling :](#more-about-validation--error-handling-)
-  - [More about the payment feature :](#more-about-the-payment-feature-)
+  - [About security :](#about-security-)
   - [Project structure](#project-structure)
   - [Database Schema](#database-schema)
   - [Installation 📥](#installation-)
@@ -81,7 +81,12 @@ Real World Backend RESTful API For E-Commerce Platform Ready for Mobile or Web E
 - used global error handler middleware to handle all operational and non-operational errors coming from controllers/handlers.
 - there is no error that does not been handled in the system.
 
-## More about the payment feature :
+## About security :
+
+- Set request size limit to 20kb to prevent attackers from sending large request body using `express-rate-limit` package.
+- Using `rate-limiter` package to help preventing brute-force attack by setting a limit on login route(5 requsets per 15min).
+- Protect routes against HTTP Parameter Pollution attacks using `hpp` package.
+- Perform input validation using : `mongoSanitize` to prevent nosql injection & `express-validator` to validate inputs .
 
 ## Project structure
 
@@ -92,13 +97,19 @@ Real World Backend RESTful API For E-Commerce Platform Ready for Mobile or Web E
 ## Project Structure
 📦e-commerce
  ┣ 📂controllers
+ ┃ ┣ 📜addressController.js
  ┃ ┣ 📜authController.js
  ┃ ┣ 📜brandController.js
+ ┃ ┣ 📜cartController.js
  ┃ ┣ 📜categoryController.js
+ ┃ ┣ 📜couponController.js
  ┃ ┣ 📜handlersFactory.js
+ ┃ ┣ 📜orderController.js
  ┃ ┣ 📜productController.js
+ ┃ ┣ 📜reviewController.js
  ┃ ┣ 📜subCategoryController.js
- ┃ ┗ 📜userController.js
+ ┃ ┣ 📜userController.js
+ ┃ ┗ 📜wishlistController.js
  ┣ 📂db
  ┃ ┗ 📜mongoose.js
  ┣ 📂middlewares
@@ -109,17 +120,28 @@ Real World Backend RESTful API For E-Commerce Platform Ready for Mobile or Web E
  ┃ ┗ 📜validatorMiddleware.js
  ┣ 📂models
  ┃ ┣ 📜brand.js
+ ┃ ┣ 📜cart.js
  ┃ ┣ 📜category.js
+ ┃ ┣ 📜coupon.js
+ ┃ ┣ 📜order.js
  ┃ ┣ 📜product.js
+ ┃ ┣ 📜review.js
  ┃ ┣ 📜subCategory.js
  ┃ ┗ 📜user.js
  ┣ 📂routers
+ ┃ ┣ 📜addressRouter.js
  ┃ ┣ 📜authRouter.js
  ┃ ┣ 📜brandRouter.js
+ ┃ ┣ 📜cartRouter.js
  ┃ ┣ 📜categoryRouter.js
+ ┃ ┣ 📜couponRouter.js
+ ┃ ┣ 📜index.js
+ ┃ ┣ 📜orderRouter.js
  ┃ ┣ 📜productRouter.js
+ ┃ ┣ 📜reviewRouter.js
  ┃ ┣ 📜subCategoryRouter.js
- ┃ ┗ 📜userRouter.js
+ ┃ ┣ 📜userRouter.js
+ ┃ ┗ 📜wishlistRouter.js
  ┣ 📂uploads
  ┃ ┣ 📂brands
  ┃ ┃ ┣ 📜brand-042dac62-3bde-4dca-8461-4aba35309445-1698000791446.jpeg
@@ -137,12 +159,15 @@ Real World Backend RESTful API For E-Commerce Platform Ready for Mobile or Web E
  ┃ ┃ ┣ 📜products.json
  ┃ ┃ ┗ 📜seeder.js
  ┃ ┣ 📂validators
+ ┃ ┃ ┣ 📜addressValidator.js
  ┃ ┃ ┣ 📜authValidator.js
  ┃ ┃ ┣ 📜brandValidator.js
  ┃ ┃ ┣ 📜categoryValidator.js
  ┃ ┃ ┣ 📜productValidator.js
+ ┃ ┃ ┣ 📜reviewValidator.js
  ┃ ┃ ┣ 📜subCategoryValidator.js
- ┃ ┃ ┗ 📜userValidator.js
+ ┃ ┃ ┣ 📜userValidator.js
+ ┃ ┃ ┗ 📜wishlistValidator.js
  ┃ ┣ 📜apiFeatures.js
  ┃ ┣ 📜AppError.js
  ┃ ┗ 📜sendEmail.js
@@ -234,6 +259,7 @@ To run this project, you will need to add the following environment variables to
 
 - [x] Cash payment And Online Orders
 - [x] Credit card payment with `stripe`
-- [ ] add validation layer for coupons ,cart and orders
+- [ ] Add validation layer for coupons ,cart and orders
+- [ ] Testing
 - [ ] Redis for cashing
 - [ ] AWS S3 for file uploading instead of using multer and server file system

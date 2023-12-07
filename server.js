@@ -10,6 +10,8 @@ const morgan = require("morgan");
 const cors = require("cors");
 const compression = require("compression");
 const hpp = require("hpp");
+const mongoSanitize = require("express-mongo-sanitize");
+const xssFilters = require("xss-filters");
 
 const AppError = require("./utils/AppError.js");
 const globalErrorHandler = require("./middlewares/errorMiddleware.js");
@@ -30,6 +32,9 @@ app.post(
 app.use(express.json({ limit: "20kb" }));
 
 app.use(express.static(path.join(__dirname, "uploads")));
+
+// To apply data sanitization (prevents nosql injection)
+app.use(mongoSanitize());
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));

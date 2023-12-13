@@ -261,5 +261,7 @@ To run this project, you will need to add the following environment variables to
 - [x] Credit card payment with `stripe`
 - [ ] Add validation layer for coupons ,cart and orders
 - [ ] Testing
-- [ ] Redis for cashing
-- [ ] AWS S3 for file uploading instead of using multer and server file system
+- [ ] Add multiple node servers and use load balancer `NGINX` to distribute the load.
+- [ ] Redis for cashing.
+- [ ] AWS S3 for file uploading instead of using multer and server file system.
+- [ ] Make a scalable monolithic app.
